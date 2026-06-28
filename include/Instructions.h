@@ -27,7 +27,7 @@ typedef struct Register
 StackElement* currentTop;
 Register rax,rbx,rcx,rdx;
 
-int PUSH(int value);
+int PUSH(float value);
 int POP(void);
 int HLT(void);
 int MOV(Register* reg, float val);
@@ -36,5 +36,6 @@ int MUL(Register* reg);
 int DIV(Register* reg);
 int MOD(Register* reg);
 int LOG(Register* reg);
+int MVN(Register* reg);
 
 #endif

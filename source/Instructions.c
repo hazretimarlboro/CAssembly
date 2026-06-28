@@ -49,7 +49,7 @@ int HLT(void)
     return SUCCESS;
 }
 
-int PUSH(int value)
+int PUSH(float value)
 {
     if(!currentTop)
     {
@@ -98,6 +98,8 @@ int ADD(Register* reg)
 
 int MUL(Register* reg)
 {
+    //takes the value from top of the stack and multiplies it with the register
+    //then moves that value to the register
     if(!reg || !currentTop)
         return NULL_POINTER_EXCEPTION;
     
@@ -108,6 +110,8 @@ int MUL(Register* reg)
 
 int DIV(Register* reg)
 {
+    //divides the register's value with the value at the top of the stack
+    //sets the register value as that value
     if(!reg || !currentTop)
         return NULL_POINTER_EXCEPTION;
     
@@ -121,6 +125,8 @@ int DIV(Register* reg)
 
 int MOD(Register* reg)
 {
+    //takes the value from the register, modulos it with the value from the top of the stack
+    //and moves it to the register
     if(!reg || !currentTop)
         return NULL_POINTER_EXCEPTION;
 
@@ -134,6 +140,7 @@ int MOD(Register* reg)
 
 int LOG(Register* reg)
 {
+    //prints the name of the register and its name
     if(!reg)
         return NULL_POINTER_EXCEPTION;
 
@@ -142,6 +149,26 @@ int LOG(Register* reg)
     return SUCCESS;
 }
 
+int MVN(Register* reg)
+{
+    //multiplies the register's value by -1
+    if(!reg)
+        return NULL_POINTER_EXCEPTION;
+
+    reg->value = (-1) * reg->value;
+
+    return SUCCESS;
+}
+
+int OR(Register* reg)
+{
+    //performs and OR operation with the integer values of the register and the value at the top of the stack
+    //then moves the value into the register
+    if(!reg)
+        return NULL_POINTER_EXCEPTION;
+
+    reg->value = (int) reg->value | (int) currentTop->value;
+}
 
 int main(int argc, char** argv)
 {
@@ -159,6 +186,7 @@ int main(int argc, char** argv)
     LOG(&rbx);
     PUSH(23);   
     DIV(&rbx);
+    MVN(&rbx);
     LOG(&rbx);
     HLT();
 
