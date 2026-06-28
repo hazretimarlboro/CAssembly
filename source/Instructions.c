@@ -168,6 +168,7 @@ int OR(Register* reg)
         return NULL_POINTER_EXCEPTION;
 
     reg->value = (int) reg->value | (int) currentTop->value;
+    return SUCCESS;
 }
 
 int main(int argc, char** argv)
