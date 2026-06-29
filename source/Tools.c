@@ -1,4 +1,5 @@
 #include "../include/Instructions.h"
+#include <string.h>
 
 Register register_from_name(char* name)
 {

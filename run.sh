@@ -1,2 +1,5 @@
-python3 ./source/Main.py $1
-gcc -c ./source -o program
+rm -f ./*.o
+gcc $(find ./source -name "*.c") -lcjson -o program
+python3 ./source/Parser.py $1
+
+./program

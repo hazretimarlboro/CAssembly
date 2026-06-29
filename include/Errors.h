@@ -7,6 +7,6 @@ typedef enum ErrorCodes
     NULL_POINTER_EXCEPTION,
     DIVISION_BY_ZERO,
     BUFFER_OVERFLOW
-};
+} ErrorCodes;
 
 #endif

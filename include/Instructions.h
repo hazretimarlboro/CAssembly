@@ -16,8 +16,8 @@ typedef struct Register
     float value;
 } Register;
 
-StackElement* currentTop;
-Register rax,rbx,rcx,rdx;
+extern StackElement* currentTop;
+extern Register rax,rbx,rcx,rdx;
 
 int PUSH(float value);
 int POP(void);
@@ -29,5 +29,6 @@ int DIV(Register* reg);
 int MOD(Register* reg);
 int LOG(Register* reg);
 int MVN(Register* reg);
+int OR(Register* reg);
 
 #endif

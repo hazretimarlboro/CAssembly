@@ -164,35 +164,9 @@ int OR(Register* reg)
 {
     //performs and OR operation with the integer values of the register and the value at the top of the stack
     //then moves the value into the register
-    if(!reg)
+    if(!reg || !currentTop)
         return NULL_POINTER_EXCEPTION;
 
     reg->value = (int) reg->value | (int) currentTop->value;
     return SUCCESS;
-}
-
-int main(int argc, char** argv)
-{
-
-
-
-    // init();
-    // PUSH(12983);
-    // PUSH(923);
-    // MOV_VAL(&rax,123);
-    // MOV_REG(&rbx,&rax);
-    // MUL(&rax);
-    // LOG(&rax);
-    // MOD(&rax);
-    // LOG(&rax);
-    // PUSH(32);
-    // ADD(&rbx);
-    // LOG(&rbx);
-    // PUSH(23);   
-    // DIV(&rbx);
-    // MVN(&rbx);
-    // LOG(&rbx);
-    // HLT();
-
-    return 0;
 }

@@ -75,14 +75,32 @@ int main()
             if(!isNumber(argq->valuestring))
             {
                 printf("Provided PUSH value is not a number! Terminating process.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
                 return 1;
             }
-            PUSH(atoi(argq->valuestring));
+            int status = PUSH(atoi(argq->valuestring));
+            if(status == ALLOCATION_ERROR)
+            {
+                printf("AllocationError at instruction PUSH. Please check if there is enough free memory.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
         }
         else if(strcmp(op,"POP") == 0)
         {
             int status = POP();
-
+            if(status == NULL_POINTER_EXCEPTION)
+            {
+                printf("NullPointerException at instruction POP. Please check if the stack has a value loaded in.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
         }
         else if(strcmp(op,"MOV") == 0)
         {
@@ -94,9 +112,20 @@ int main()
                 if(reg.ID == -1)
                 {
                     printf("Provided MOV register does not exist! Terminating process.");
+                    free(jsoncontent);
+                    cJSON_Delete(json);
+                    HLT();
                     return 1;
                 }
-                MOV_VAL(&reg,atoi(argg->valuestring));
+                int status = MOV_VAL(&reg,atoi(argg->valuestring));
+                if(status == NULL_POINTER_EXCEPTION)
+                {
+                    printf("NullPointerException at instruction MOV. Please check whether your register naming is correct.");
+                    free(jsoncontent);
+                    cJSON_Delete(json);
+                    HLT();
+                    return 1;
+                }
             }
             else
             {
@@ -105,9 +134,20 @@ int main()
                 if(leftreg.ID == -1 || rightreg.ID == -1)
                 {
                     printf("Provided MOV register does not exist! Terminating process.");
+                    free(jsoncontent);
+                    cJSON_Delete(json);
+                    HLT();
                     return 1;
                 }
-                MOV_REG(&leftreg, &rightreg);
+                int status = MOV_REG(&leftreg, &rightreg);
+                if(status == NULL_POINTER_EXCEPTION)
+                {
+                    printf("NullPointerException at instruction MOV. Please check whether your register naming is correct.");
+                    free(jsoncontent);
+                    cJSON_Delete(json);
+                    HLT();
+                    return 1;
+                }
             }
         }
         else if(strcmp(op,"HLT")==0)
@@ -122,11 +162,21 @@ int main()
             if(reg.ID == -1)
             {
                 printf("Provided ADD value is not a register! Terminating process.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
                 return 1;
             }
 
-            ADD(&reg);
-            return 0;
+            int status = ADD(&reg);
+            if(status == NULL_POINTER_EXCEPTION)
+            {
+                printf("NullPointerException at instruction ADD. Please check if register naming is correct and there is a value in the stack");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
         }
         else if(strcmp(op,"MUL")== 0)
         {
@@ -135,11 +185,21 @@ int main()
             if(reg.ID == -1)
             {
                 printf("Provided MUL value is not a register! Terminating process.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
                 return 1;
             }
 
-            MUL(&reg);
-            return 0;
+            int status = MUL(&reg);
+            if(status == NULL_POINTER_EXCEPTION)
+            {
+                printf("NullPointerException at instruction MUL. Please check if register naming is correct and there is a value in the stack");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
         }
         else if(strcmp(op,"DIV")== 0)
         {
@@ -147,25 +207,132 @@ int main()
             Register reg = register_from_name(argl->valuestring);
             if(reg.ID == -1)
             {
-                printf("Provided ADD value is not a register! Terminating process.");
+                printf("Provided DIV value is not a register! Terminating process.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
                 return 1;
             }
 
-            ADD(&reg);
-            return 0;
+            int status = DIV(&reg);
+            if(status == NULL_POINTER_EXCEPTION)
+            {
+                printf("NullPointerException at instruction DIV. Please check if register naming is correct and there is a value in the stack");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
+            else if(status == DIVISION_BY_ZERO)
+            {
+                printf("Division by zero at instruction DIV. Please check the stack value.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
         }
-        else if(strcmp(op,"ADD")== 0)
+        else if(strcmp(op,"MOD")== 0)
         {
             cJSON* argl = cJSON_GetArrayItem(args,0);
             Register reg = register_from_name(argl->valuestring);
             if(reg.ID == -1)
             {
-                printf("Provided ADD value is not a register! Terminating process.");
+                printf("Provided MOD value is not a register! Terminating process.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
                 return 1;
             }
 
-            ADD(&reg);
-            return 0;
+            int status = MOD(&reg);
+            if(status == NULL_POINTER_EXCEPTION)
+            {
+                printf("NullPointerException at instruction MOD. Please check if register naming is correct and there is a value in the stack");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
+            else if(status == DIVISION_BY_ZERO)
+            {
+                printf("Division by zero at instruction MOD. Please check the stack value.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
+        }
+        else if(strcmp(op, "LOG") == 0)
+        {
+            cJSON* argl = cJSON_GetArrayItem(args,0);
+            Register reg = register_from_name(argl->valuestring);
+            if(reg.ID == -1)
+            {
+                printf("Provided LOG value is not a register! Terminating process.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
+
+            int status = LOG(&reg);
+
+            if(status == NULL_POINTER_EXCEPTION)
+            {
+                printf("NullPointerException at instruction LOG. Please check if register naming is correct.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
+        }
+        else if(strcmp(op, "MVN") == 0)
+        {
+            cJSON* argl = cJSON_GetArrayItem(args,0);
+            Register reg = register_from_name(argl->valuestring);
+            if(reg.ID == -1)
+            {
+                printf("Provided LOG value is not a register! Terminating process.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
+
+            int status = MVN(&reg);
+            if(status == NULL_POINTER_EXCEPTION)
+            {
+                printf("NullPointerException at instruction MVN. Please check if register naming is correct.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
+        }
+        else if(strcmp(op, "OR") == 0)
+        {
+            cJSON* argl = cJSON_GetArrayItem(args,0);
+            Register reg = register_from_name(argl->valuestring);
+            if(reg.ID == -1)
+            {
+                printf("Provided OR value is not a register! Terminating process.");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
+
+            int status = OR(&reg);
+            if(status == NULL_POINTER_EXCEPTION)
+            {
+                printf("NullPointerException at instruction OR. Please check if the register naming is correct and there is a value in the stack");
+                free(jsoncontent);
+                cJSON_Delete(json);
+                HLT();
+                return 1;
+            }
+
         }
 
 
@@ -177,6 +344,6 @@ int main()
 
     free(jsoncontent);
     cJSON_Delete(json);
-
+    HLT();
     return 0;
 }
