@@ -9,8 +9,6 @@ Register register_from_name(char* name)
         return rbx;
     else if(strcmp(name, "rcx")==0)
         return rcx;
-    else if(strcmp(name,"rcx")==0)
-        return rcx;
     else if(strcmp(name, "rdx")==0)
         return rdx;
     
