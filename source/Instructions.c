@@ -1,9 +1,9 @@
 #include "../include/Instructions.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../include/Errors.h"
+
 #define MAX_SIZE 4096
-#define MOV_VAL(dest, val) MOV((dest), (val))
-#define MOV_REG(dest, src) MOV((dest), (src)->value)
 
 
 StackElement* currentTop;
@@ -173,23 +173,26 @@ int OR(Register* reg)
 
 int main(int argc, char** argv)
 {
-    init();
-    PUSH(12983);
-    PUSH(923);
-    MOV_VAL(&rax,123);
-    MOV_REG(&rbx,&rax);
-    MUL(&rax);
-    LOG(&rax);
-    MOD(&rax);
-    LOG(&rax);
-    PUSH(32);
-    ADD(&rbx);
-    LOG(&rbx);
-    PUSH(23);   
-    DIV(&rbx);
-    MVN(&rbx);
-    LOG(&rbx);
-    HLT();
+
+
+
+    // init();
+    // PUSH(12983);
+    // PUSH(923);
+    // MOV_VAL(&rax,123);
+    // MOV_REG(&rbx,&rax);
+    // MUL(&rax);
+    // LOG(&rax);
+    // MOD(&rax);
+    // LOG(&rax);
+    // PUSH(32);
+    // ADD(&rbx);
+    // LOG(&rbx);
+    // PUSH(23);   
+    // DIV(&rbx);
+    // MVN(&rbx);
+    // LOG(&rbx);
+    // HLT();
 
     return 0;
 }

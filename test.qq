@@ -1,0 +1,4 @@
+PUSH 12;
+POP;
+PUSH 54;
+MOV rax 23;

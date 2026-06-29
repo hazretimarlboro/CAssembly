@@ -3,14 +3,6 @@
 
 typedef struct StackElement StackElement;
 
-typedef enum ErrorCodes
-{
-    SUCCESS,
-    ALLOCATION_ERROR,
-    NULL_POINTER_EXCEPTION,
-    DIVISION_BY_ZERO
-};
-
 typedef struct StackElement
 {
     float value;
