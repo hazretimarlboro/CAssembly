@@ -11,6 +11,7 @@
 #define MOV_VAL(dest, val) MOV((dest), (val))
 #define MOV_REG(dest, src) MOV((dest), (src)->value)
 
+
 bool isNumber(char str[]) {
     if (strlen(str) == 0) return false;
     for (int i = 0; i < strlen(str); i++) {
