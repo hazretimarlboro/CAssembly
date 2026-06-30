@@ -53,9 +53,14 @@ int main(int argc, char** argv)
     while(CPU.running)
     {
         
+        if (PC >= MAX_PROGRAM_SIZE)
+        {
+            CPU.running = 0;
+            printf("Segmentation fault: PC out of program bounds at %u\n", PC);
+            return 1;
+        }
 
         uint8_t opcode = Memory[PC++];
-
         switch(opcode)
         {
             case 0x01: {
