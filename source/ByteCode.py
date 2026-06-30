@@ -16,6 +16,7 @@ OPCODES = {
     "MOD_REG":  0x0c,
     "LOG"    :  0x0d,
     "MVN"    :  0x0e,
+    "JMP"    :  0x0f,
     "HLT"    :  0xff
 }
 
@@ -30,10 +31,12 @@ def toByte(number: int):
     return number.to_bytes(4, "little", signed=True)
 
 data = json.loads(sys.stdin.read())
+instructions = data[0]
+labels = data[1]
 
 bytecode = []
 
-for inst in data:
+for inst in instructions:
     op = inst[0]
 
     if op == "POP":
@@ -125,6 +128,14 @@ for inst in data:
 
     elif op == "HLT":
         bytecode.append(OPCODES["HLT"])
+
+    elif op == "JMP":
+        if inst[1] in labels:
+            target = labels[inst[1]]
+            bytecode.append(OPCODES["JMP"])
+            bytecode.extend(toByte(target))
+        else:
+            raise Exception(f"Unknown JMP label: {inst[1]}")
 
 
 

@@ -1,5 +1,6 @@
 #include "../include/Instructions.h"
 #include "../include/Tools.h"
+#include <stdio.h>
 
 uint32_t fetch_32(uint16_t* PC)
 {
@@ -8,7 +9,8 @@ uint32_t fetch_32(uint16_t* PC)
 
     if (pc + 3 >= MEMORY_SIZE) {
         CPU.running = 0;
-        return 0xFFFFFFFF;
+        printf("Segmentation fault (fetch_32 out of bounds)\n");
+        return 0;
     }
 
     uint32_t value =

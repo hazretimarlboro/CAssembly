@@ -19,9 +19,54 @@ def lex(program_text):
 
     return tokens
 
+def is_register(x):
+    return x in ["rax","rbx","rcx","rdx"]
+
+# ---------- Instruction Sizes ----------
+def instr_size(parts):
+    op = parts[0]
+
+    if op.endswith(":"):
+        return 0
+
+    if op == "HLT":
+        return 1
+
+    if op == "LOG":
+        return 2
+
+    if op == "POP":
+        return 2
+
+    if op == "MVN":
+        return 2
+
+    if op == "PUSH":
+        return 5
+    
+    if op == "JMP":
+        return 5
+
+    if op in ("MOV", "ADD", "MUL", "DIV", "MOD"):
+        if is_register(parts[2]):
+            return 3
+        else:
+            return 6
+
+    return 0
+
+
 # ---------- PARSER ----------
 def parse(tokens):
     instructions = []
+    labels = {}
+    pc = 0x0000
+
+    for parts in tokens:
+        if parts[0].endswith(":"):
+            labels[parts[0][:-1]] = pc
+        else:
+            pc += instr_size(parts)
 
     for parts in tokens:
         op = parts[0]
@@ -56,11 +101,17 @@ def parse(tokens):
         elif op == "HLT":
             instructions.append(("HLT",))
         
+        elif str(op).endswith(":"):
+            continue
+        
+        elif op == "JMP":
+            instructions.append(("JMP", parts[1]))
+
     
         else:
             raise Exception(f"Unknown instruction: {op}")
 
-    return instructions
+    return instructions,labels
 
 
 # ---------- DRIVER ----------
@@ -69,9 +120,9 @@ def assemble(file_path):
         text = f.read()
 
     tokens = lex(text)
-    program = parse(tokens)
+    program,labels = parse(tokens)
 
-    return program
+    return program,labels
 
 
 # ---------- TEST ----------
