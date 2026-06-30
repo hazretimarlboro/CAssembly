@@ -195,6 +195,7 @@ int main(int argc, char** argv)
                 else if(status == DIVISION_BY_ZERO)
                 {
                     printf("DivisionByZero at instruction DIV");
+                    return 1;
                 }
                 break;
             }
@@ -214,6 +215,7 @@ int main(int argc, char** argv)
                 else if(status == DIVISION_BY_ZERO)
                 {
                     printf("DivisionByZero at instruction DIV");
+                    return 1;
                 }
                 break;
             }
@@ -232,6 +234,7 @@ int main(int argc, char** argv)
                 else if(status == DIVISION_BY_ZERO)
                 {
                     printf("DivisionByZero at instruction MOD");
+                    return 1;
                 }
                 break;
             }
@@ -251,6 +254,7 @@ int main(int argc, char** argv)
                 else if(status == DIVISION_BY_ZERO)
                 {
                     printf("DivisionByZero at instruction MOD");
+                    return 1;
                 }
                 break;
             }
