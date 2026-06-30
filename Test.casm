@@ -1,0 +1,43 @@
+; ---------- MOV tests ----------
+MOV rax 10;
+MOV rbx 5;
+MOV rcx 20;
+MOV rdx 3;
+
+; ---------- ADD tests ----------
+ADD rax rbx;
+ADD rbx 7;
+
+; ---------- MUL tests ----------
+MUL rax rbx;
+MUL rcx 2;
+
+; ---------- DIV tests ----------
+DIV rax rbx;
+DIV rcx 2;
+
+; ---------- MOD tests ----------
+MOD rbx rdx;
+MOD rax 3;
+
+; ---------- MVN test ----------
+MVN rax;
+
+; ---------- STACK tests ----------
+PUSH 100;
+PUSH 200;
+POP rax;
+POP rbx;
+
+; ---------- LOG tests ----------
+LOG rax;
+LOG rbx;
+LOG rcx;
+LOG rdx;
+
+; ---------- edge cases ----------
+DIV rax 1;
+MOD rcx 1;
+
+; ---------- halt ----------
+HLT;

@@ -2,16 +2,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../include/Errors.h"
+#include "../include/Tools.h"
 
-#define MAX_SIZE 4096
-
-
-StackElement* currentTop;
 Register rax,rbx,rcx,rdx;
+struct CPUState CPU;
+uint16_t StackPointer;
+uint8_t Memory[MEMORY_SIZE];;
 
 int init(void)
 {
-    currentTop = NULL;
+    StackPointer = STACK_TOP; // 0xffff
+    CPU.running = 1;
     rax.ID = 0;
     rbx.ID = 1;
     rcx.ID = 2;
@@ -27,146 +28,169 @@ int init(void)
     return SUCCESS;
 }
 
-int POP(void)
+
+/*
+    We are using a downward growing stack so POP should increase the pointer while PUSH decreases it
+*/
+int POP(Register* reg)
 {
-    if(!currentTop)
+    //check if the stack has values in it
+    if(StackPointer == STACK_TOP)
+        return STACK_UNDERFLOW;
+    
+    //move the value into the register and increase stack pointer to restore SP to previous stack frame position
+    if(!reg)
         return NULL_POINTER_EXCEPTION;
 
-    //free the current stack's top while preserving the 2nd element as the new top
-    StackElement* sibling = currentTop->sibling;
-    free(currentTop);
-    currentTop = sibling;
+    reg->value = fetch_32(&StackPointer);
+
     return SUCCESS;
 }
 
 int HLT(void)
 {
-    //self explanatory
-    while(currentTop)
-    {
-        POP();
-    }
+    CPU.running = 0;
     return SUCCESS;
 }
 
-int PUSH(float value)
+int PUSH(uint32_t value)
 {
-    if(!currentTop)
-    {
-        //if there is no one in the stack, create a new element and make it the stack's top
-        StackElement* newElement = malloc(sizeof(StackElement));
-        if(!newElement)
-            return ALLOCATION_ERROR;
-        newElement->value = value;
-        newElement->sibling = NULL;
-        currentTop = newElement;
-        return SUCCESS;
-    }
-    
-    //if there is someone in the stack, create a new element and make the element point to the
-    //stack's top, then make the new element the new top
-    StackElement* newEl = malloc(sizeof(StackElement));
-    if(!newEl)
-        return ALLOCATION_ERROR;
-    newEl->value = value;
-    newEl->sibling = currentTop;
-    currentTop = newEl;
+    //check if the stack is full
+    if(StackPointer <= STACK_BOTTOM)
+        return STACK_OVERFLOW;
+
+    //move value into stack and decrease stack pointer
+    StackPointer -= 4;
+    write_u32(StackPointer, value);
+
     return SUCCESS;
 }
 
-int MOV(Register* reg, float val)
+int MOV_IMM(Register* reg, uint32_t val)
 {
     if(!reg)
         return NULL_POINTER_EXCEPTION;
-    //moves a value into a register
-    //works on register-register pattern via the macros
+
     reg->value = val;
 
     return SUCCESS;
 }
 
-int ADD(Register* reg)
+int MOV_REG(Register* reg1, Register* reg2)
 {
-    // takes the value from top of the stack and adds it to the register
-    if(!reg || !currentTop)
+    //moves the value in one register into another
+    if(!reg1 || !reg2)
         return NULL_POINTER_EXCEPTION;
-    
-    reg->value += currentTop->value;
-    
-    return POP();
+
+    reg1->value = reg2->value;
+    return SUCCESS;
 }
 
-int MUL(Register* reg)
+int ADD_IMM(Register* reg, uint32_t val)
 {
-    //takes the value from top of the stack and multiplies it with the register
-    //then moves that value to the register
-    if(!reg || !currentTop)
+    if(!reg)
         return NULL_POINTER_EXCEPTION;
-    
-    reg->value *= currentTop->value;
 
-    return POP();
+    reg->value += val;
+
+    return SUCCESS;
 }
 
-int DIV(Register* reg)
+int ADD_REG(Register* reg1, Register* reg2)
 {
-    //divides the register's value with the value at the top of the stack
-    //sets the register value as that value
-    if(!reg || !currentTop)
+    if(!reg1 || !reg2)
         return NULL_POINTER_EXCEPTION;
     
-    if(currentTop->value == 0)
+    reg1->value += reg2->value;
+
+    return SUCCESS;
+}
+
+int MUL_IMM(Register* reg, uint32_t val)
+{
+    if(!reg)
+        return NULL_POINTER_EXCEPTION;
+    
+    reg->value *= val;
+
+    return SUCCESS;
+}
+
+int MUL_REG(Register* reg1, Register* reg2)
+{
+    if(!reg1 || !reg2)
+        return NULL_POINTER_EXCEPTION;
+
+    reg1->value *= reg2->value;
+
+    return SUCCESS;
+}
+
+int DIV_IMM(Register* reg, uint32_t val)
+{
+    if(!reg)
+        return NULL_POINTER_EXCEPTION;
+    if(val == 0)
         return DIVISION_BY_ZERO;
     
-    reg->value /= currentTop->value;
-
-    return POP();
+    reg->value /= val;
+    return SUCCESS;
 }
 
-int MOD(Register* reg)
+int DIV_REG(Register* reg1, Register* reg2)
 {
-    //takes the value from the register, modulos it with the value from the top of the stack
-    //and moves it to the register
-    if(!reg || !currentTop)
+    if(!reg1 || !reg2)
         return NULL_POINTER_EXCEPTION;
-
-    if(currentTop->value == 0)
+    if(reg2->value == 0)
         return DIVISION_BY_ZERO;
     
-    reg->value = (int)reg->value % (int)currentTop->value;
+    reg1->value /= reg2->value;
+    return SUCCESS;
+}
 
-    return POP();
+int MOD_IMM(Register* reg, uint32_t val)
+{
+    if(!reg)
+        return NULL_POINTER_EXCEPTION;
+    if(val == 0)
+        return DIVISION_BY_ZERO;
+    
+    reg->value = reg->value % val;
+
+    return SUCCESS;
+}
+
+int MOD_REG(Register* reg1 ,Register* reg2)
+{
+    if(!reg1 || !reg2)
+        return NULL_POINTER_EXCEPTION;
+    if(reg2->value == 0)
+        return DIVISION_BY_ZERO;
+
+    reg1->value = reg1->value % reg2->value;
+    return SUCCESS;
 }
 
 int LOG(Register* reg)
 {
-    //prints the name of the register and its name
+    //prints the name of the register and its value
     if(!reg)
         return NULL_POINTER_EXCEPTION;
 
-    printf("%s: %f\n",reg->name,reg->value);
+    printf("%s: %u\n",reg->name,reg->value);
 
     return SUCCESS;
 }
 
 int MVN(Register* reg)
 {
-    //multiplies the register's value by -1
-    if(!reg)
-        return NULL_POINTER_EXCEPTION;
+    //turns the value in the register into signed
+    if (!reg) return NULL_POINTER_EXCEPTION;
 
-    reg->value = (-1) * reg->value;
+    int32_t signed_val = (int32_t)reg->value;
+    signed_val = -signed_val;
 
-    return SUCCESS;
-}
+    reg->value = (uint32_t)signed_val;
 
-int OR(Register* reg)
-{
-    //performs and OR operation with the integer values of the register and the value at the top of the stack
-    //then moves the value into the register
-    if(!reg || !currentTop)
-        return NULL_POINTER_EXCEPTION;
-
-    reg->value = (int) reg->value | (int) currentTop->value;
     return SUCCESS;
 }
