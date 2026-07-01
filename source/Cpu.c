@@ -507,7 +507,7 @@ int main(int argc, char** argv)
                 break;
             }
 
-            case 0x013: {
+            case 0x13: {
                 //CMP_REG
                 if(!PCvalid(PC))
                 {
