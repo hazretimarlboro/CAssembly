@@ -1,0 +1,19 @@
+; ============================================================
+; Program: Two's Complement Negation
+; A short, focused demo of MVN (the ISA's only sign-flip
+; instruction) and of LOG printing values as signed decimal.
+; Demonstrates: MVN, MOV_REG, LOG
+; Expected output: rax: 17, rbx: -17, rbx: 17
+; ============================================================
+
+MOV rax 17          ; rax = 17
+LOG rax
+
+MOV rbx rax          ; rbx = 17 (copy)
+MVN rbx                ; rbx = -17
+LOG rbx
+
+MVN rbx                  ; rbx = -(-17) = 17  (round trip)
+LOG rbx
+
+HLT

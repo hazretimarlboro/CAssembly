@@ -1,0 +1,34 @@
+; ============================================================
+; Program: Maximum of Two Numbers (No Native "Greater Than")
+; This ISA only has CMP for equality (no LT/GT), so "greater
+; than" is built from equality + decrement: count both numbers
+; down to 0 in lockstep. Whichever hits 0 first is the smaller
+; one, so the other register holds the max.
+; Demonstrates: CMP_REG, CMP_IMM, MOV_REG as non-destructive
+;               copy, a classic bit-trick-style ISA workaround
+; Inputs: a = 23, b = 47   Expected output: rbx: 47
+; ============================================================
+
+MOV rax 23          ; a
+MOV rbx 47          ; b
+MOV rcx rax          ; counter_a = a  (copy so a/b stay intact)
+MOV rdx rbx            ; counter_b = b
+
+max_loop:
+    CMP rcx 0
+    JEQ b_is_max            ; counter_a hit 0 first -> b >= a
+    CMP rdx 0
+    JEQ a_is_max              ; counter_b hit 0 first -> a > b
+    ADD rcx -1
+    ADD rdx -1
+    JMP max_loop
+
+a_is_max:
+    LOG rax
+    JMP max_done
+
+b_is_max:
+    LOG rbx
+
+max_done:
+    HLT

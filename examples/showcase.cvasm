@@ -23,6 +23,7 @@
 MOV rax 48
 MOV rbx 18
 
+
 gcd_loop:
     CMP rbx 0
     JEQ gcd_done

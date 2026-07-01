@@ -1,6 +1,6 @@
-# CASM — A Custom Assembly Language & Virtual Machine
+# CVASM — A Custom Assembly Language & Virtual Machine
 
-CASM is a small, complete toolchain: a hand-rolled assembly-like language, an
+CVASM is a small, complete toolchain: a hand-rolled assembly-like language, an
 assembler, and a register-based virtual CPU that executes the resulting
 bytecode. It was built in two languages on purpose — Python for the
 front end (lexing, parsing, encoding) and C for the back end (the CPU

@@ -1,0 +1,31 @@
+; ============================================================
+; Program: Primality Test
+; Tests whether 97 is prime by trial division.
+; Demonstrates: MOD_REG, CMP_REG, CMP_IMM, JEQ, JNE, JMP
+; Output encoding: rcx = 1 -> prime, rcx = 0 -> not prime
+; Expected output: rcx: 1   (97 is prime)
+; ============================================================
+
+MOV rax 97          ; number to test
+MOV rbx 2           ; divisor, starts at 2
+MOV rcx 1           ; result flag: assume prime until proven otherwise
+
+prime_loop:
+    CMP rbx rax          ; CMP_REG: has the divisor reached the number itself?
+    JEQ prime_done         ; if so, every smaller divisor has been tried
+
+    MOV rdx rax               ; rdx = copy of the number (don't destroy rax)
+    MOD rdx rbx                 ; rdx = number mod divisor
+    CMP rdx 0
+    JNE prime_next                 ; remainder != 0 -> not a divisor, keep going
+
+    MOV rcx 0                        ; remainder == 0 -> found a divisor, not prime
+    JMP prime_done
+
+prime_next:
+    ADD rbx 1
+    JMP prime_loop
+
+prime_done:
+    LOG rcx
+    HLT

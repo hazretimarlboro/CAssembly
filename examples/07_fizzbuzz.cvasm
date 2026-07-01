@@ -1,0 +1,54 @@
+; ============================================================
+; Program: FizzBuzz (1 to 20)
+; The CPU has no string/text output -- LOG only prints a
+; register's numeric value -- so results are encoded as
+; special sentinel codes instead of text:
+;     -1  => "Fizz"       (divisible by 3)
+;     -3  => "Buzz"       (divisible by 5)
+;     -2  => "FizzBuzz"   (divisible by both)
+;   n     => plain number (otherwise)
+; Demonstrates: MOD_IMM, nested CMP_IMM/JEQ/JNE branching,
+;               many labels and unconditional JMP
+; ============================================================
+
+MOV rax 1           ; counter i, starts at 1
+MOV rbx 21          ; loop bound = N + 1 (exclusive), N = 20
+
+fizzbuzz_loop:
+    CMP rax rbx
+    JEQ fizzbuzz_done
+
+    MOV rcx rax          ; rcx = i mod 3
+    MOD rcx 3
+    MOV rdx rax             ; rdx = i mod 5
+    MOD rdx 5
+
+    CMP rcx 0
+    JNE check_buzz
+    CMP rdx 0
+    JNE print_fizz
+    MOV rcx -2                  ; divisible by both -> FizzBuzz
+    LOG rcx
+    JMP fizzbuzz_next
+
+print_fizz:
+    MOV rcx -1                    ; divisible by 3 only -> Fizz
+    LOG rcx
+    JMP fizzbuzz_next
+
+check_buzz:
+    CMP rdx 0
+    JNE print_num
+    MOV rcx -3                       ; divisible by 5 only -> Buzz
+    LOG rcx
+    JMP fizzbuzz_next
+
+print_num:
+    LOG rax                            ; not divisible by 3 or 5
+
+fizzbuzz_next:
+    ADD rax 1
+    JMP fizzbuzz_loop
+
+fizzbuzz_done:
+    HLT

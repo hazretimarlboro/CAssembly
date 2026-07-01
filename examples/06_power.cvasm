@@ -1,0 +1,21 @@
+; ============================================================
+; Program: Integer Exponentiation
+; Computes 3^8 using repeated multiplication.
+; Demonstrates: MUL_REG, ADD_IMM (decrement), CMP_IMM, JEQ
+; Expected output: rax: 6561
+; ============================================================
+
+MOV rax 1           ; result accumulator
+MOV rbx 3           ; base
+MOV rcx 8           ; exponent counter
+
+pow_loop:
+    CMP rcx 0
+    JEQ pow_done
+    MUL rax rbx
+    ADD rcx -1
+    JMP pow_loop
+
+pow_done:
+    LOG rax
+    HLT

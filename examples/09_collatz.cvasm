@@ -1,0 +1,36 @@
+; ============================================================
+; Program: Collatz Conjecture
+; Counts how many steps it takes for N = 27 to reach 1 under
+; the rule: n -> n/2 if even, n -> 3n+1 if odd.
+; Demonstrates: MOD_IMM (even/odd test), DIV_IMM, MUL_IMM,
+;               ADD_IMM, JEQ/JNE branching inside a loop
+; Expected output: rbx: 111  (steps), rax: 1  (final value)
+; ============================================================
+
+MOV rax 27          ; starting number N
+MOV rbx 0           ; step counter
+
+collatz_loop:
+    CMP rax 1
+    JEQ collatz_done
+
+    MOV rcx rax          ; rcx = copy of current value
+    MOD rcx 2              ; rcx = value mod 2 (even/odd test)
+    CMP rcx 0
+    JNE collatz_odd
+
+    DIV rax 2                  ; even: n = n / 2
+    JMP collatz_step
+
+collatz_odd:
+    MUL rax 3                    ; odd: n = 3n + 1
+    ADD rax 1
+
+collatz_step:
+    ADD rbx 1
+    JMP collatz_loop
+
+collatz_done:
+    LOG rbx              ; number of steps taken
+    LOG rax              ; final value (always 1)
+    HLT

@@ -1,0 +1,21 @@
+; ============================================================
+; Program: Fibonacci Sequence
+; Prints the first 10 Fibonacci numbers.
+; Demonstrates: MOV_REG, ADD_REG, ADD_IMM, CMP_IMM, JNE, LOG
+; Expected output: 0 1 1 2 3 5 8 13 21 34
+; ============================================================
+
+MOV rax 0           ; rax = fib(n-1), starts at fib(0)
+MOV rbx 1           ; rbx = fib(n),   starts at fib(1)
+MOV rcx 10          ; rcx = number of terms left to print
+
+fib_loop:
+    LOG rax          ; print current term
+    MOV rdx rax      ; rdx = old fib(n-1)   (save before overwrite)
+    MOV rax rbx      ; fib(n-1) becomes fib(n)
+    ADD rbx rdx      ; fib(n) becomes old fib(n) + old fib(n-1)
+    ADD rcx -1       ; decrement term counter
+    CMP rcx 0
+    JNE fib_loop
+
+HLT

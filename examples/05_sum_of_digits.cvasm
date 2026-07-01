@@ -1,0 +1,25 @@
+; ============================================================
+; Program: Sum of Digits
+; Extracts and sums the decimal digits of a number using
+; repeated division and modulo by 10.
+; Demonstrates: MOD_REG, DIV_REG, ADD_REG, JEQ
+; Input: 8675309   Expected output: rbx: 38  (8+6+7+5+3+0+9)
+; ============================================================
+
+MOV rax 8675309     ; number to process
+MOV rbx 0            ; digit sum accumulator
+MOV rcx 10             ; divisor constant
+
+digit_loop:
+    CMP rax 0
+    JEQ digit_done
+
+    MOV rdx rax          ; rdx = copy of remaining number
+    MOD rdx rcx            ; rdx = last digit (rax mod 10)
+    ADD rbx rdx               ; sum += digit
+    DIV rax rcx                 ; rax = rax / 10 (strip last digit)
+    JMP digit_loop
+
+digit_done:
+    LOG rbx
+    HLT

@@ -1,0 +1,19 @@
+; ============================================================
+; Program: Iterative Factorial
+; Computes 6! using a countdown loop.
+; Demonstrates: MOV_IMM, MUL_REG, ADD_IMM (decrement),
+;               CMP_IMM, JNE, LOG, HLT
+; Expected output: rax: 720
+; ============================================================
+
+MOV rax 1           ; rax = accumulator (result)
+MOV rbx 6           ; rbx = counter, starts at N = 6
+
+loop:
+    MUL rax rbx      ; rax = rax * rbx
+    ADD rbx -1       ; rbx = rbx - 1
+    CMP rbx 0        ; compare rbx to 0
+    JNE loop         ; loop while rbx != 0
+
+LOG rax              ; print final result
+HLT

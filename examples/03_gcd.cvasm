@@ -1,0 +1,23 @@
+; ============================================================
+; Program: Greatest Common Divisor (Euclidean Algorithm)
+; Computes GCD(48, 18).
+; Demonstrates: MOD_REG, MOV_REG, JEQ, JMP, CMP_IMM
+; Expected output: rax: 6
+; ============================================================
+
+MOV rax 48          ; a
+MOV rbx 18          ; b
+
+gcd_loop:
+    CMP rbx 0
+    JEQ gcd_done         ; while b != 0:
+
+    MOD rax rbx          ; rax = a mod b   -> this becomes the new b
+    MOV rcx rax           ; rcx = (a mod b), save it
+    MOV rax rbx             ; a = old b
+    MOV rbx rcx               ; b = a mod b
+    JMP gcd_loop
+
+gcd_done:
+    LOG rax              ; rax now holds gcd(48, 18)
+    HLT

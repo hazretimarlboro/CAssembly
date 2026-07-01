@@ -1,0 +1,30 @@
+; ============================================================
+; Program: Stack Sum
+; Pushes five immediate values onto the stack, then pops
+; them all back off, summing them into rax.
+; (Note: PUSH only accepts immediate literals in this ISA --
+;  registers can't be pushed directly.)
+; Demonstrates: PUSH, POP, downward-growing stack, ADD_REG
+; Expected output: rax: 150   (10+20+30+40+50)
+; ============================================================
+
+PUSH 10
+PUSH 20
+PUSH 30
+PUSH 40
+PUSH 50
+
+MOV rax 0           ; sum accumulator
+MOV rbx 5           ; number of items pushed
+
+stack_loop:
+    CMP rbx 0
+    JEQ stack_done
+    POP rcx              ; pop most recently pushed value into rcx
+    ADD rax rcx
+    ADD rbx -1
+    JMP stack_loop
+
+stack_done:
+    LOG rax
+    HLT
