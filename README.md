@@ -8,7 +8,7 @@ itself) — to mirror how real toolchains like GCC or the JVM separate
 "understanding the source" from "executing the machine."
 
 ```
- your .casm file
+ your .cvasm file
         │
         ▼
  ┌─────────────┐        ┌──────────────┐        ┌───────────────┐
@@ -20,7 +20,7 @@ itself) — to mirror how real toolchains like GCC or the JVM separate
 ```
 
 Each stage is a separate, inspectable process — you can literally run
-`python3 source/Language.py program.casm` on its own and see the parsed
+`python3 source/Language.py program.cvasm` on its own and see the parsed
 instruction list as JSON before it ever becomes bytecode.
 
 ---
@@ -28,10 +28,10 @@ instruction list as JSON before it ever becomes bytecode.
 ## Quick start
 
 ```bash
-./run.sh examples/demo.casm
+./run.sh examples/demo.cvasm
 ```
 
-This assembles `examples/demo.casm`, links the C runtime, and executes the
+This assembles `examples/demo.cvasm`, links the C runtime, and executes the
 resulting bytecode. The demo program computes `5!` (factorial) using a
 countdown loop, round-trips a value through the stack, and demonstrates
 signed values with `MVN`:
@@ -142,7 +142,8 @@ if the project continues.
 │   ├── Tools.h
 │   └── Errors.h             # shared error codes
 └── examples/
-    └── demo.casm            # factorial + stack + MVN demo
+    └── demo.cvasm            # factorial + stack + MVN demo
+    └── showcase.cvasm
 ```
 
 ## Design decisions worth calling out
