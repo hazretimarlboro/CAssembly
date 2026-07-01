@@ -47,11 +47,19 @@ def instr_size(parts):
     if op == "JMP":
         return 5
 
-    if op in ("MOV", "ADD", "MUL", "DIV", "MOD"):
+    if op == "JNE":
+        return 5
+    
+    if op == "JEQ":
+        return 5
+
+    if op in ("MOV", "ADD", "MUL", "DIV", "MOD", "CMP"):
         if is_register(parts[2]):
             return 3
         else:
             return 6
+    
+
 
     return 0
 
@@ -107,7 +115,15 @@ def parse(tokens):
         elif op == "JMP":
             instructions.append(("JMP", parts[1]))
 
-    
+        elif op == "JNE":
+            instructions.append(("JNE",parts[1]))
+
+        elif op == "JEQ":
+            instructions.append(("JEQ",parts[1]))
+
+        elif op == "CMP":
+            instructions.append(("CMP", parts[1], parts[2]))
+
         else:
             raise Exception(f"Unknown instruction: {op}")
 

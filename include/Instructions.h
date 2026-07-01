@@ -16,6 +16,8 @@ typedef struct Register
 struct CPUState
 {
     int running;
+    int condition;
+    int flagValid;
 };
 
 extern uint8_t Memory[MEMORY_SIZE];
@@ -46,6 +48,8 @@ int DIV_IMM(Register* reg, uint32_t val);
 int DIV_REG(Register* reg, Register* reg2);
 int MOD_IMM(Register* reg, uint32_t val);
 int MOD_REG(Register* reg, Register* reg2);
+int CMP_IMM(Register* reg, uint32_t val);
+int CMP_REG(Register* reg, Register* reg2);
 int LOG(Register* reg);
 int MVN(Register* reg);
 

@@ -1,0 +1,32 @@
+; ============================================================
+; demo.casm - exercises every instruction in the CASM ISA
+; Computes 5! (factorial) using a countdown loop, then
+; demonstrates the stack and signed values via MVN.
+; ============================================================
+
+MOV rax 1        ; rax = accumulator (result), starts at 1
+MOV rbx 5        ; rbx = counter, starts at 5
+
+loop:
+    CMP rbx 0
+    JEQ done          ; if counter == 0, we're finished
+    MUL rax rbx       ; accumulator *= counter
+    ADD rbx -1        ; counter -= 1
+    JMP loop
+
+done:
+    LOG rax           ; expect 120 (5!)
+
+    ; stack sanity check (PUSH only accepts immediates in this ISA,
+    ; so we push a literal rather than the register itself)
+    PUSH 120
+    MOV rax 0         ; clobber rax
+    LOG rax           ; expect 0
+    POP rax           ; restore the result
+    LOG rax           ; expect 120 again
+
+    ; signed value demo
+    MVN rax           ; negate: 120 -> -120
+    LOG rax           ; expect -120
+
+    HLT

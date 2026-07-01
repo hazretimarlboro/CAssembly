@@ -17,6 +17,10 @@ OPCODES = {
     "LOG"    :  0x0d,
     "MVN"    :  0x0e,
     "JMP"    :  0x0f,
+    "JEQ"    :  0x10,
+    "JNE"    :  0x11,
+    "CMP_IMM":  0x12,
+    "CMP_REG":  0x13,
     "HLT"    :  0xff
 }
 
@@ -135,11 +139,38 @@ for inst in instructions:
             bytecode.append(OPCODES["JMP"])
             bytecode.extend(toByte(target))
         else:
-            raise Exception(f"Unknown JMP label: {inst[1]}")
+            raise Exception(f"[ByteCode Error] Unknown JMP label: {inst[1]}")
+        
+    elif op == "JNE":
+        if inst[1] in labels:
+            target = labels[inst[1]]
+            bytecode.append(OPCODES["JNE"])
+            bytecode.extend(toByte(target))
+        else:
+            raise Exception(f"[ByteCode Error] Unknown JNE label: {inst[1]}")
+    
+    elif op == "JEQ":
+        if inst[1] in labels:
+            target = labels[inst[1]]
+            bytecode.append(OPCODES["JEQ"])
+            bytecode.extend(toByte(target))
+        else:
+            raise Exception(f"[ByteCode Error] Unknown JEQ label: {inst[1]}")
+        
+    elif op == "CMP":
+        reg1 = REGISTERS[inst[1]]
+        if inst[2] in REGISTERS:
+            reg2 = REGISTERS[inst[2]]
+            bytecode.append(OPCODES["CMP_REG"])
+            bytecode.append(reg1)
+            bytecode.append(reg2)
+        else:
+            imm = int(inst[2])
+            bytecode.append(OPCODES["CMP_IMM"])
+            bytecode.append(reg1)
+            bytecode.extend(toByte(imm))
 
 
-
-
-assert all(0 <= b <= 255 for b in bytecode), "Bytecode out of range!"
+assert all(0 <= b <= 255 for b in bytecode), "[ByteCode Error] Bytecode out of range!"
 
 sys.stdout.buffer.write(bytearray(bytecode))

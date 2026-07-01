@@ -5,18 +5,38 @@
 
 uint16_t PC;
 
-void load_binary(const char *filename)
+int load_binary(const char *filename)
 {
     FILE *f = fopen(filename, "rb");
     if (!f)
-    {
-        perror("Failed to open binary file");
-        return;
+        return 2;
+
+    // Determine the real file size first. Reading capped at MAX_PROGRAM_SIZE
+    // bytes can never itself detect an oversized file (fread can't return
+    // more than the cap you give it), so we have to check the size up front.
+    if (fseek(f, 0, SEEK_END) != 0) {
+        fclose(f);
+        return 2;
+    }
+    long fileSize = ftell(f);
+    if (fileSize < 0) {
+        fclose(f);
+        return 2;
+    }
+    rewind(f);
+
+    if ((size_t)fileSize > MAX_PROGRAM_SIZE) {
+        fclose(f);
+        return 1;
+    }
+    if (fileSize == 0) {
+        fclose(f);
+        return 3;
     }
 
-    size_t bytesRead = fread(Memory, 1, 0x7FFF, f);
-
+    fread(Memory, 1, (size_t)fileSize, f);
     fclose(f);
+    return 0;
 }
 
 
@@ -48,7 +68,26 @@ int main(int argc, char** argv)
 
     PC=0;
     
-    load_binary(argv[1]);
+    int status = load_binary(argv[1]);
+
+    switch (status)
+    {
+        case 1:
+            printf("[VM ERROR] Program size can't fit in memory!\n");
+            return 1;
+            break;
+        
+        case 2:
+            printf("[VM ERROR] Failed to open the binary file!\n");
+            return 1;
+            break;
+
+        case 3:
+            printf("[VM ERROR] Binary file is empty!\n");
+            return 1;
+            break;
+    }
+
 
     while(CPU.running)
     {
@@ -101,6 +140,7 @@ int main(int argc, char** argv)
                 if(status == STACK_OVERFLOW)
                 {
                     printf("[CPU ERROR] StackOverflow at instruction PUSH.\n");
+                    return 1;
                 }
                 break;
             }
@@ -375,20 +415,124 @@ int main(int argc, char** argv)
 
             case 0x0f: {
                 //JMP
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (JMP).\n",opcode);
+                    return 1;
+                }
                 uint32_t target = fetch_32(&PC);
                 if (target >= MAX_PROGRAM_SIZE)
                 {
-                    printf("[VM ERROR] Invalid jump target\n");
+                    printf("[VM ERROR] Invalid JMP target\n");
                     return 1;
                 }
                 PC = (uint16_t)target;
                 break;
             }
 
+            case 0x10: {
+                //JEQ
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (JEQ).\n",opcode);
+                    return 1;
+                }
+                uint32_t target = fetch_32(&PC);
+                if (target >= MAX_PROGRAM_SIZE)
+                {
+                    printf("[VM ERROR] Invalid JEQ target\n");
+                    return 1;
+                }
+
+                if(!CPU.flagValid)
+                {
+                    printf("[VM ERROR] Invalid CMP flag\n");
+                    return 1;
+                }
+                if(CPU.condition)
+                {
+                    PC = (uint16_t) target;
+                }
+                break;
+            }
+
+            case 0x11: {
+                //JNE
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (JNE).\n",opcode);
+                    return 1;
+                }
+                uint32_t target = fetch_32(&PC);
+                if(target >= MAX_PROGRAM_SIZE)
+                {
+                    printf("[VM ERROR] Invalid JNE target\n");
+                    return 1;
+                }
+
+                if(!CPU.flagValid)
+                {
+                    printf("[VM ERROR] Invalid CMP flag\n");
+                    return 1;
+                }
+
+                if(!CPU.condition)
+                {
+                    PC = (uint16_t) target;
+                }
+                break;
+            }
+
+            case 0x12: {
+                //CMP_IMM
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (CMP).\n",opcode);
+                    return 1;
+                }
+
+                Register* reg = getReg(Memory[PC]);
+                PC++;
+                uint32_t val = fetch_32(&PC);
+                int status = CMP_IMM(reg,val);
+                if(status == NULL_POINTER_EXCEPTION)
+                {
+                    printf("[CPU ERROR] NullPointerException at instruction CMP.\n");
+                    return 1;
+                }
+                break;
+            }
+
+            case 0x013: {
+                //CMP_REG
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (CMP).\n",opcode);
+                    return 1;
+                }
+
+                Register* reg = getReg(Memory[PC]);
+                PC++;
+                Register* reg2 = getReg(Memory[PC]);
+                PC++;
+                int status = CMP_REG(reg, reg2);
+                if(status == NULL_POINTER_EXCEPTION)
+                {
+                    printf("[CPU ERROR] NullPointerException at instruction CMP.\n");
+                    return 1;
+                }
+                break;
+            }
+
             case 0xff: {
                 //HLT
                 HLT();
-                return 1;
+                return 0;
             }
 
             default:

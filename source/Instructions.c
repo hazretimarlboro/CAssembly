@@ -7,12 +7,14 @@
 Register rax,rbx,rcx,rdx;
 struct CPUState CPU;
 uint16_t StackPointer;
-uint8_t Memory[MEMORY_SIZE];;
+uint8_t Memory[MEMORY_SIZE];
 
 int init(void)
 {
     StackPointer = STACK_TOP; // 0xffff
     CPU.running = 1;
+    CPU.flagValid = 0;
+    CPU.condition = 0;
     rax.ID = 0;
     rbx.ID = 1;
     rcx.ID = 2;
@@ -177,7 +179,10 @@ int LOG(Register* reg)
     if(!reg)
         return NULL_POINTER_EXCEPTION;
 
-    printf("%s: %u\n",reg->name,reg->value);
+    // Registers are just 32 bits with no built-in signedness, but MVN exists
+    // specifically to produce negative values, so print them as signed
+    // decimal (two's complement) rather than always as unsigned.
+    printf("%s: %d\n",reg->name,(int32_t)reg->value);
 
     return SUCCESS;
 }
@@ -192,5 +197,25 @@ int MVN(Register* reg)
 
     reg->value = (uint32_t)signed_val;
 
+    return SUCCESS;
+}
+
+int CMP_REG(Register* reg1, Register* reg2)
+{
+    if(!reg1 || !reg2)
+        return NULL_POINTER_EXCEPTION;
+    
+    CPU.flagValid = 1;
+    CPU.condition = (reg1->value == reg2->value);
+    return SUCCESS;
+}
+
+int CMP_IMM(Register* reg, uint32_t val)
+{
+    if(!reg)
+        return NULL_POINTER_EXCEPTION;
+
+    CPU.flagValid = 1;
+    CPU.condition = (reg->value == val);
     return SUCCESS;
 }

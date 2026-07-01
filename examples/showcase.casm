@@ -1,0 +1,137 @@
+; ============================================================
+; showcase.casm — the most complex program this ISA can express
+;
+; The language has 4 registers, equality-only comparison (CMP/JEQ/JNE),
+; static jump labels (no computed jumps, no CALL/RET), and PUSH that
+; only accepts immediates (not live register values) — so there is no
+; way to spill registers to the stack or implement real subroutines.
+; Every "algorithm" below has to be built purely from MOV/ADD/MUL/DIV/
+; MOD/MVN/CMP/JMP/JEQ/JNE over 4 registers, sequenced as one long
+; straight-line program with loops.
+;
+; Six independent algorithms, back to back:
+;   1. GCD(48, 18)               — Euclidean algorithm
+;   2. LCM(48, 18)               — reuses the GCD result
+;   3. First 10 Fibonacci terms  — two-register recurrence
+;   4. Primality test: 97        — trial division (expected: prime)
+;   5. Primality test: 91        — trial division (expected: composite, 7x13)
+;   6. Digit sum of 6789         — repeated mod/div peeling
+;   7. Signed ledger             — ADD with negative immediates + MVN
+; ============================================================
+
+; ---------- 1. GCD(48, 18) via the Euclidean algorithm ----------
+MOV rax 48
+MOV rbx 18
+
+gcd_loop:
+    CMP rbx 0
+    JEQ gcd_done
+    MOV rcx rax
+    MOD rcx rbx        ; rcx = rax % rbx
+    MOV rax rbx         ; rax = rbx
+    MOV rbx rcx          ; rbx = rcx
+    JMP gcd_loop
+
+gcd_done:
+    LOG rax             ; expect 6
+    MOV rdx rax          ; stash gcd in rdx, we need rax/rbx for LCM
+
+; ---------- 2. LCM(48, 18) = (48 * 18) / gcd ----------
+MOV rax 48
+MOV rbx 18
+MUL rax rbx             ; rax = 864
+DIV rax rdx              ; rax = 864 / 6
+LOG rax                   ; expect 144
+
+; ---------- 3. First 10 Fibonacci terms ----------
+MOV rax 0               ; prev
+MOV rbx 1                ; curr
+MOV rcx 10                ; how many terms left to print
+
+fib_loop:
+    CMP rcx 0
+    JEQ fib_done
+    LOG rbx
+    MOV rdx rbx          ; temp = curr
+    ADD rbx rax           ; curr = curr + prev
+    MOV rax rdx            ; prev = old curr
+    ADD rcx -1               ; counter--
+    JMP fib_loop
+
+fib_done:
+
+; ---------- 4. Primality test: is 97 prime? ----------
+MOV rax 97               ; N
+MOV rbx 2                 ; divisor, starts at 2
+MOV rcx 0                  ; found-a-factor flag (0 = still assuming prime)
+
+prime1_loop:
+    CMP rbx rax
+    JEQ prime1_done         ; divisor reached N with no factor found -> prime
+    CMP rcx 1
+    JEQ prime1_done          ; already found a factor -> stop early
+    MOV rdx rax
+    MOD rdx rbx                ; rdx = N % divisor
+    CMP rdx 0
+    JNE prime1_next
+    MOV rcx 1                    ; remainder was 0 -> composite
+prime1_next:
+    ADD rbx 1
+    JMP prime1_loop
+
+prime1_done:
+    LOG rax                ; the number tested: 97
+    LOG rcx                 ; 0 = prime, 1 = composite -> expect 0
+
+; ---------- 5. Primality test: is 91 prime? (91 = 7 x 13) ----------
+MOV rax 91
+MOV rbx 2
+MOV rcx 0
+
+prime2_loop:
+    CMP rbx rax
+    JEQ prime2_done
+    CMP rcx 1
+    JEQ prime2_done
+    MOV rdx rax
+    MOD rdx rbx
+    CMP rdx 0
+    JNE prime2_next
+    MOV rcx 1
+prime2_next:
+    ADD rbx 1
+    JMP prime2_loop
+
+prime2_done:
+    LOG rax                ; the number tested: 91
+    LOG rcx                 ; expect 1 (composite)
+
+; ---------- 6. Digit sum of 6789 ----------
+MOV rax 6789
+MOV rbx 0                ; running sum
+
+digit_loop:
+    CMP rax 0
+    JEQ digit_done
+    MOV rcx rax
+    MOD rcx 10            ; rcx = last digit
+    ADD rbx rcx             ; sum += digit
+    DIV rax 10                ; drop last digit
+    JMP digit_loop
+
+digit_done:
+    LOG rbx               ; expect 30 (6+7+8+9)
+
+; ---------- 7. Signed ledger: deposits, a fee via MVN, an overdraft ----------
+MOV rax 100              ; opening balance
+ADD rax 50                 ; deposit         -> 150
+ADD rax -30                  ; withdrawal      -> 120
+MOV rbx 45                     ; fee amount
+MVN rbx                          ; negate it       -> -45
+ADD rax rbx                        ; apply fee       -> 75
+LOG rax                              ; expect 75
+
+ADD rax -200              ; a withdrawal bigger than the balance -> overdraft
+LOG rax                     ; expect -125 (proves LOG prints signed correctly)
+
+HLT
