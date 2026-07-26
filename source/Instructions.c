@@ -4,7 +4,7 @@
 #include "../include/Errors.h"
 #include "../include/Tools.h"
 
-Register rax,rbx,rcx,rdx;
+Register rax,rbx,rcx,rdx,call;
 struct CPUState CPU;
 uint16_t StackPointer;
 uint8_t Memory[MEMORY_SIZE];
@@ -19,14 +19,17 @@ int init(void)
     rbx.ID = 1;
     rcx.ID = 2;
     rdx.ID = 3;
+    call.ID = 4;
     rax.value = 0;
     rbx.value = 0;
     rcx.value = 0;
     rdx.value = 0;
+    call.value = 0;
     rax.name = "rax";
     rbx.name = "rbx";
     rcx.name = "rcx";
     rdx.name = "rdx";
+    call.name = "call";
     return SUCCESS;
 }
 

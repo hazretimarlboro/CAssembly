@@ -1,0 +1,14 @@
+
+MOV rax 32
+MOV rbx 22
+CALL ahmet
+
+deniz:
+    MOV rcx 20
+    LOG rcx
+    HLT
+
+ahmet:
+    LOG rax
+    LOG rbx
+    RET

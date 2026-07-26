@@ -48,6 +48,7 @@ Register* getReg(uint8_t id)
         case 0x01: return &rbx;
         case 0x02: return &rcx;
         case 0x03: return &rdx;
+        case 0x04: return &call;
         default: return NULL;
     }
 }
@@ -538,6 +539,7 @@ int main(int argc, char** argv)
                     return 1;
                 }
                 Register* reg = getReg(Memory[PC]);
+                PC++;
                 int status = PUSH_REG(reg);
                 if(status == NULL_POINTER_EXCEPTION)
                 {
@@ -551,7 +553,57 @@ int main(int argc, char** argv)
                 }
                 break;
             }
+            
+            case 0x15: {
+                //CALL
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02x (CALL).\n", opcode);
+                    return 1;
+                }
+                uint32_t target = fetch_32(&PC);
+                if(target >= MAX_PROGRAM_SIZE)
+                {
+                    printf("[VM ERROR] Invalid CALL target\n");
+                    return 1;
+                }
+                int status = PUSH((uint32_t)PC);
+                if(status == STACK_OVERFLOW)
+                {
+                    printf("[CPU ERROR] BufferOverflow at instruction CALL.\n");
+                    return 1;
+                }
+                PC = (uint16_t) target;
+                break;
+            }
 
+            case 0x16: {
+                //RET
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02x (RET).\n", opcode);
+                    return 1;
+                }
+                int status = POP(&call);
+                if(status == STACK_UNDERFLOW)
+                {
+                    printf("[CPU ERROR] StackUnderflow at instruction RET.\n");
+                    return 1;
+                }
+                if(call.value < MAX_PROGRAM_SIZE)
+                {
+                    PC = (uint16_t) call.value;
+                }
+                else 
+                {
+                    printf("[VM ERROR] Instruction RET tried to jump to an invalid target.\n");
+                    return 1;
+                }
+
+                break;
+            }
 
             case 0xff: {
                 //HLT

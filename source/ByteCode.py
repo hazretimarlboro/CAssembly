@@ -22,6 +22,8 @@ OPCODES = {
     "CMP_IMM":  0x12,
     "CMP_REG":  0x13,
     "PUSH_REG": 0x14,
+    "CALL"   : 0x15,
+    "RET"    : 0x16,
     "HLT"    :  0xff
 }
 
@@ -29,7 +31,8 @@ REGISTERS = {
     "rax": 0x00,
     "rbx": 0x01,
     "rcx": 0x02,
-    "rdx": 0x03
+    "rdx": 0x03,
+    "call": 0x04
 }
 
 def toByte(number: int):
@@ -139,6 +142,9 @@ for inst in instructions:
     elif op == "HLT":
         bytecode.append(OPCODES["HLT"])
 
+    elif op == "RET":
+        bytecode.append(OPCODES["RET"])
+
     elif op == "JMP":
         if inst[1] in labels:
             target = labels[inst[1]]
@@ -162,6 +168,14 @@ for inst in instructions:
             bytecode.extend(toByte(target))
         else:
             raise Exception(f"[ByteCode Error] Unknown JEQ label: {inst[1]}")
+
+    elif op == "CALL":
+        if inst[1] in labels:
+            target = labels[inst[1]]
+            bytecode.append(OPCODES["CALL"])
+            bytecode.extend(toByte(target))
+        else:
+            raise Exception(f"[ByteCode Error] Unknown CALL target: {inst[1]}")
         
     elif op == "CMP":
         reg1 = REGISTERS[inst[1]]

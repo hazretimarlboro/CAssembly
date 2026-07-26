@@ -20,7 +20,7 @@ def lex(program_text):
     return tokens
 
 def is_register(x):
-    return x in ["rax","rbx","rcx","rdx"]
+    return x in ["rax","rbx","rcx","rdx","call"]
 
 # ---------- Instruction Sizes ----------
 def instr_size(parts):
@@ -56,6 +56,12 @@ def instr_size(parts):
     
     if op == "JEQ":
         return 5
+
+    if op == "CALL":
+        return 5
+
+    if op == "RET":
+        return 1
 
     if op in ("MOV", "ADD", "MUL", "DIV", "MOD", "CMP"):
         if is_register(parts[2]):
@@ -127,6 +133,12 @@ def parse(tokens):
 
         elif op == "CMP":
             instructions.append(("CMP", parts[1], parts[2]))
+
+        elif op == "CALL":
+            instructions.append(("CALL", parts[1]))
+
+        elif op == "RET":
+            instructions.append(("RET",))
 
         else:
             raise Exception(f"Unknown instruction: {op}")

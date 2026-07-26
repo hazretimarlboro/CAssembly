@@ -162,4 +162,5 @@ if the project continues.
 
 ---
 ## New Changes
-Added PUSH register functionality
+25-07-2026 Added PUSH register functionality
+26-07-2026 Added procedures with CALL and RET. Added a new register named "call" register that is used to hold the POP'ed value during procedure calls
