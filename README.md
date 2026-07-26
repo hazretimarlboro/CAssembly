@@ -162,4 +162,4 @@ if the project continues.
 
 ---
 ## New Changes
-Added PUSH <register> functionality
+Added PUSH register functionality
