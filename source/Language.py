@@ -42,7 +42,11 @@ def instr_size(parts):
         return 2
 
     if op == "PUSH":
-        return 5
+        if is_register(parts[1]):
+            return 2
+        else:
+            return 5
+
     
     if op == "JMP":
         return 5

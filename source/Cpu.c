@@ -529,6 +529,30 @@ int main(int argc, char** argv)
                 break;
             }
 
+            case 0x14: {
+                //PUSH_REG
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02x (PUSH_REG).\n", opcode);
+                    return 1;
+                }
+                Register* reg = getReg(Memory[PC]);
+                int status = PUSH_REG(reg);
+                if(status == NULL_POINTER_EXCEPTION)
+                {
+                    printf("[CPU ERROR] NullPointerExceeption at instruction PUSH.\n");
+                    return 1;
+                }
+                else if(status == STACK_OVERFLOW)
+                {
+                    printf("[CPU ERROR] StackOverflow at instruction PUSH.\n");
+                    return 1;
+                }
+                break;
+            }
+
+
             case 0xff: {
                 //HLT
                 HLT();

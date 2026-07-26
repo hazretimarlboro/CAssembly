@@ -35,6 +35,7 @@ extern struct CPUState CPU;
 
 int init(void);
 
+int PUSH_REG(Register* reg);
 int PUSH(uint32_t value);
 int POP(Register* reg);
 int HLT(void);

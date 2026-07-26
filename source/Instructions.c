@@ -68,6 +68,19 @@ int PUSH(uint32_t value)
     return SUCCESS;
 }
 
+int PUSH_REG(Register* reg) {
+    if (StackPointer <= STACK_BOTTOM) {
+        return STACK_OVERFLOW;
+    }
+    if(!reg)
+        return NULL_POINTER_EXCEPTION;
+
+    StackPointer -= 4;
+    write_u32(StackPointer, reg->value);
+
+    return SUCCESS;
+}
+
 int MOV_IMM(Register* reg, uint32_t val)
 {
     if(!reg)

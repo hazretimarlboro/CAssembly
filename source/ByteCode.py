@@ -21,6 +21,7 @@ OPCODES = {
     "JNE"    :  0x11,
     "CMP_IMM":  0x12,
     "CMP_REG":  0x13,
+    "PUSH_REG": 0x14,
     "HLT"    :  0xff
 }
 
@@ -121,9 +122,14 @@ for inst in instructions:
         bytecode.append(reg1)
 
     elif op == "PUSH":
-        imm = int(inst[1])
-        bytecode.append(OPCODES["PUSH"])
-        bytecode.extend(toByte(imm))
+        if inst[1] in REGISTERS:
+            reg1 = REGISTERS[inst[1]]
+            bytecode.append(OPCODES["PUSH_REG"])
+            bytecode.append(reg1)
+        else:
+            imm = int(inst[1])
+            bytecode.append(OPCODES["PUSH"])
+            bytecode.extend(toByte(imm))
 
     elif op == "LOG":
         reg1 = REGISTERS[inst[1]]
