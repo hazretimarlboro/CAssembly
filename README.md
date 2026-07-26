@@ -159,3 +159,7 @@ if the project continues.
 - **Fixed-width types throughout** (`uint8_t`, `uint16_t`, `uint32_t`)
   instead of `int`/`long`, so the memory layout and instruction encoding
   are exact and portable rather than dependent on platform integer sizes.
+
+---
+## New Changes
+Added PUSH <register> functionality
