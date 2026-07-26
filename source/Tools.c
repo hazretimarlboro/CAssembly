@@ -1,6 +1,7 @@
 #include "../include/Instructions.h"
 #include "../include/Tools.h"
 #include <stdio.h>
+#include <string.h>
 
 uint32_t fetch_32(uint16_t* PC)
 {
@@ -26,7 +27,8 @@ uint32_t fetch_32(uint16_t* PC)
 
 void write_u32(uint16_t addr, uint32_t value)
 {
-    uint32_t bits = *(uint32_t*)&value;
+    uint32_t bits;
+    memcpy(&bits,&value,sizeof(bits));
 
     Memory[addr + 0] = (uint8_t)(bits & 0xFF);
     Memory[addr + 1] = (uint8_t)((bits >> 8) & 0xFF);
