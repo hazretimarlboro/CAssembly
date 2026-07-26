@@ -56,6 +56,7 @@ just enough to be Turing-complete and fun to program in.
 | `rbx`    | general purpose     |
 | `rcx`    | general purpose     |
 | `rdx`    | general purpose     |
+| `call`  | CALL register        |
 
 ### Instruction set
 
@@ -71,7 +72,7 @@ just enough to be Turing-complete and fun to program in.
 | `JMP`  | `JMP label`          | Unconditional jump |
 | `JEQ`  | `JEQ label`          | Jump if the last `CMP` was equal |
 | `JNE`  | `JNE label`          | Jump if the last `CMP` was not equal |
-| `PUSH` | `PUSH imm`           | Push an immediate onto the stack |
+| `PUSH` | `PUSH imm/ PUSH reg`           | Push an immediate/register value onto the stack |
 | `POP`  | `POP reg`            | Pop the stack into a register |
 | `LOG`  | `LOG reg`            | Print a register's value (signed decimal) |
 | `HLT`  | `HLT`                | Stop execution |
@@ -113,16 +114,6 @@ Every instruction handler returns a status code (`SUCCESS`,
 than crashing outright — invalid register bytes, division by zero, and
 stack exhaustion are all caught and reported with a specific error message
 and a non-zero exit code instead of segfaulting.
-
----
-
-### Known limitation (by design, not a bug)
-
-`PUSH` only accepts an immediate value (`PUSH 42`), not a register
-(`PUSH rax` is a parse-time error). Extending it to support pushing a
-register's live value would need a second opcode (`PUSH_REG`, mirroring how
-every other instruction has `_IMM`/`_REG` variants) — a natural next step
-if the project continues.
 
 ---
 
