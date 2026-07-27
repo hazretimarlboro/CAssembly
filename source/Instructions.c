@@ -264,3 +264,25 @@ int CMP_IMM(Register* reg, uint32_t val)
     CPU.great = (v1 > v2);
     return SUCCESS;
 }
+
+int LOAD_REG(Register* reg, uint32_t ptr)
+{
+    if(ptr > DATA_MAX || ptr < DATA_MIN)
+        return SEGMENTATION_FAULT;
+
+    if(!reg)
+        return NULL_POINTER_EXCEPTION;
+
+    reg->value = fetch_32((uint16_t*) &ptr);
+    return SUCCESS;
+}
+
+
+int LOAD_PTR(uint32_t dest, uint32_t src)
+{
+    if(dest > DATA_MAX || dest < DATA_MIN || src > DATA_MAX || src < DATA_MIN)
+        return SEGMENTATION_FAULT;
+    
+    write_u32((uint16_t) dest, fetch_32((uint16_t*) &src));
+    return SUCCESS;
+}

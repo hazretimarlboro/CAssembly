@@ -28,6 +28,8 @@ OPCODES = {
     "JG"     : 0x18,
     "JLE"    : 0x19,
     "JGE"    : 0x1a,
+    "LOAD_PTR"   : 0x1b,
+    "LOAD_REG"   : 0x1c,
     "HLT"    :  0xff
 }
 
@@ -227,7 +229,27 @@ for inst in instructions:
             bytecode.append(reg1)
             bytecode.extend(toByte(imm))
 
+    elif op == "LOAD":
+        if inst[1] in REGISTERS:
+            # LOAD reg ptr
+            value = int(inst[2],16)
+            bytecode.append(OPCODES["LOAD_REG"])
+            bytecode.append(REGISTERS[inst[1]])
+            bytecode.extend(toByte(value))
+        else:
+            # LOAD ptr ptr
+            print(f"{inst[1]} and {inst[2]}")
+            ptr1 = int(inst[1],16)
+            ptr2 = int(inst[2],16)
+            bytecode.append(OPCODES["LOAD_PTR"])
+            bytecode.extend(toByte(ptr1))
+            bytecode.extend(toByte(ptr2))
 
-assert all(0 <= b <= 255 for b in bytecode), "[ByteCode Error] Bytecode out of range!"
+
+for i, b in enumerate(bytecode):
+    if not isinstance(b, int):
+        raise TypeError(f"bytecode[{i}] = {b!r} ({type(b).__name__})")
+    if not (0 <= b <= 255):
+        raise ValueError(f"bytecode[{i}] = {b} is out of byte range")
 
 sys.stdout.buffer.write(bytearray(bytecode))

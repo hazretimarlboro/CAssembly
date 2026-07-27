@@ -72,6 +72,9 @@ int main(int argc, char** argv)
     
     int status = load_binary(argv[1]);
 
+    //debug
+    write_u32(0x8000, 128);
+
     switch (status)
     {
         case 1:
@@ -711,6 +714,37 @@ int main(int argc, char** argv)
                 {
                     PC = (uint16_t) target;
                 }
+                break;
+            }
+
+            case 0x1b: {
+
+            }
+
+            case 0x1c: {
+                //LOAD_REG
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (LOAD_REG).\n",opcode);
+                    return 1;
+                }
+
+                Register* reg = getReg(Memory[PC]);
+                PC++;
+                uint32_t ptr = fetch_32(&PC);
+                int status = LOAD_REG(reg, ptr);
+                if(status == SEGMENTATION_FAULT)
+                {
+                    printf("[CPU ERROR] Pointer value exceeds data section's limit at instruction LOAD.\n");
+                    return 1;
+                }
+                else if(status == NULL_POINTER_EXCEPTION)
+                {
+                    printf("[CPU ERROR] NullPointerExceeption at instruction LOAD.\n");
+                    return 1;
+                }
+
                 break;
             }
 

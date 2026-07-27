@@ -4,6 +4,8 @@
 #define STACK_TOP 0xFFFF
 #define STACK_BOTTOM 0xA000
 #define MAX_PROGRAM_SIZE 0x7FFF
+#define DATA_MAX 0x9FFF
+#define DATA_MIN 0x8000
 #include <stdint.h>
 
 typedef struct Register
@@ -55,6 +57,7 @@ int CMP_IMM(Register* reg, uint32_t val);
 int CMP_REG(Register* reg, Register* reg2);
 int LOG(Register* reg);
 int MVN(Register* reg);
-
+int LOAD_REG(Register* reg, uint32_t ptr);
+int LOAD_PTR(uint32_t dest, uint32_t src);
 
 #endif

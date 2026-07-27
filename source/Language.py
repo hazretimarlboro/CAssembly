@@ -63,6 +63,12 @@ def instr_size(parts):
     if op == "CALL":
         return 5
 
+    if op == "LOAD":
+        if is_register(parts[1]):
+            return 5
+        else:
+            return 8
+
     if op == "RET":
         return 1
 
@@ -154,6 +160,9 @@ def parse(tokens):
 
         elif op == "RET":
             instructions.append(("RET",))
+
+        elif op == "LOAD":
+            instructions.append(("LOAD", parts[1], parts[2]))
 
         else:
             raise Exception(f"Unknown instruction: {op}")
