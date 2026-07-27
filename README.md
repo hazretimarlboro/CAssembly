@@ -162,3 +162,4 @@ and a non-zero exit code instead of segfaulting.
 26-07-2026 Added procedures with CALL and RET. Added a new register named "call" register that is used to hold the POP'ed value during procedure calls
 
 27-07-2026 Added JLE(jump if less/equal) JGE(jump if greater/equal) JG(jump if greater) and JL(jump if less)
+27-07-2026 Added stack pointer register "stack"
