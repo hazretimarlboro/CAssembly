@@ -4,15 +4,12 @@
 #include "../include/Errors.h"
 #include "../include/Tools.h"
 
-Register rax,rbx,rcx,rdx,call;
+Register rax,rbx,rcx,rdx,call,stack;
 struct CPUState CPU;
-uint16_t StackPointer;
 uint8_t Memory[MEMORY_SIZE];
 
 int init(void)
 {
-    StackPointer = STACK_TOP; // 0xffff
-
     CPU.running = 1;
     CPU.flagValid = 0;
     CPU.less = 0;
@@ -24,18 +21,21 @@ int init(void)
     rcx.ID = 2;
     rdx.ID = 3;
     call.ID = 4;
+    stack.ID = 5;
 
     rax.value = 0;
     rbx.value = 0;
     rcx.value = 0;
     rdx.value = 0;
     call.value = 0;
+    stack.value = STACK_TOP; // 0xffff
 
     rax.name = "rax";
     rbx.name = "rbx";
     rcx.name = "rcx";
     rdx.name = "rdx";
     call.name = "call";
+    stack.name = "stack";
 
     return SUCCESS;
 }
@@ -47,14 +47,14 @@ int init(void)
 int POP(Register* reg)
 {
     //check if the stack has values in it
-    if(StackPointer == STACK_TOP)
+    if(stack.value == STACK_TOP)
         return STACK_UNDERFLOW;
     
     //move the value into the register and increase stack pointer to restore SP to previous stack frame position
     if(!reg)
         return NULL_POINTER_EXCEPTION;
 
-    reg->value = fetch_32(&StackPointer);
+    reg->value = fetch_32((uint16_t*) &(stack.value));
 
     return SUCCESS;
 }
@@ -68,25 +68,25 @@ int HLT(void)
 int PUSH(uint32_t value)
 {
     //check if the stack is full
-    if(StackPointer <= STACK_BOTTOM)
+    if(stack.value <= STACK_BOTTOM)
         return STACK_OVERFLOW;
 
     //move value into stack and decrease stack pointer
-    StackPointer -= 4;
-    write_u32(StackPointer, value);
+    stack.value -= 4;
+    write_u32(stack.value, value);
 
     return SUCCESS;
 }
 
 int PUSH_REG(Register* reg) {
-    if (StackPointer <= STACK_BOTTOM) {
+    if (stack.value <= STACK_BOTTOM) {
         return STACK_OVERFLOW;
     }
     if(!reg)
         return NULL_POINTER_EXCEPTION;
 
-    StackPointer -= 4;
-    write_u32(StackPointer, reg->value);
+    stack.value -= 4;
+    write_u32(stack.value, reg->value);
 
     return SUCCESS;
 }
@@ -157,8 +157,13 @@ int DIV_IMM(Register* reg, uint32_t val)
         return NULL_POINTER_EXCEPTION;
     if(val == 0)
         return DIVISION_BY_ZERO;
-    
-    reg->value /= val;
+
+    // Values can be negative (see MVN), so divide as signed two's
+    // complement, not as raw uint32_t - otherwise a negative operand
+    // gets reinterpreted as a huge positive number and the result is
+    // garbage instead of a truncated-toward-zero signed quotient.
+    int32_t result = (int32_t)reg->value / (int32_t)val;
+    reg->value = (uint32_t)result;
     return SUCCESS;
 }
 
@@ -168,8 +173,9 @@ int DIV_REG(Register* reg1, Register* reg2)
         return NULL_POINTER_EXCEPTION;
     if(reg2->value == 0)
         return DIVISION_BY_ZERO;
-    
-    reg1->value /= reg2->value;
+
+    int32_t result = (int32_t)reg1->value / (int32_t)reg2->value;
+    reg1->value = (uint32_t)result;
     return SUCCESS;
 }
 
@@ -179,8 +185,9 @@ int MOD_IMM(Register* reg, uint32_t val)
         return NULL_POINTER_EXCEPTION;
     if(val == 0)
         return DIVISION_BY_ZERO;
-    
-    reg->value = reg->value % val;
+
+    int32_t result = (int32_t)reg->value % (int32_t)val;
+    reg->value = (uint32_t)result;
 
     return SUCCESS;
 }
@@ -192,7 +199,8 @@ int MOD_REG(Register* reg1 ,Register* reg2)
     if(reg2->value == 0)
         return DIVISION_BY_ZERO;
 
-    reg1->value = reg1->value % reg2->value;
+    int32_t result = (int32_t)reg1->value % (int32_t)reg2->value;
+    reg1->value = (uint32_t)result;
     return SUCCESS;
 }
 
@@ -227,11 +235,18 @@ int CMP_REG(Register* reg1, Register* reg2)
 {
     if(!reg1 || !reg2)
         return NULL_POINTER_EXCEPTION;
-    
+
+    // Compare as signed 32-bit values (see MVN) - a plain uint32_t
+    // compare treats every negative value as larger than every
+    // positive one, which breaks JL/JG/JLE/JGE whenever either side
+    // is negative.
+    int32_t v1 = (int32_t)reg1->value;
+    int32_t v2 = (int32_t)reg2->value;
+
     CPU.flagValid = 1;
-    CPU.eq = (reg1->value == reg2->value);
-    CPU.less = (reg1->value < reg2->value);
-    CPU.great = (reg1->value > reg2->value);
+    CPU.eq = (v1 == v2);
+    CPU.less = (v1 < v2);
+    CPU.great = (v1 > v2);
     return SUCCESS;
 }
 
@@ -240,9 +255,12 @@ int CMP_IMM(Register* reg, uint32_t val)
     if(!reg)
         return NULL_POINTER_EXCEPTION;
 
+    int32_t v1 = (int32_t)reg->value;
+    int32_t v2 = (int32_t)val;
+
     CPU.flagValid = 1;
-    CPU.eq = (reg->value == val);
-    CPU.less = (reg->value < val);
-    CPU.great = (reg->value > val);
+    CPU.eq = (v1 == v2);
+    CPU.less = (v1 < v2);
+    CPU.great = (v1 > v2);
     return SUCCESS;
 }

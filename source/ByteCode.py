@@ -36,7 +36,8 @@ REGISTERS = {
     "rbx": 0x01,
     "rcx": 0x02,
     "rdx": 0x03,
-    "call": 0x04
+    "call": 0x04,
+    "stack": 0x05
 }
 
 def toByte(number: int):

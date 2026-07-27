@@ -49,6 +49,7 @@ Register* getReg(uint8_t id)
         case 0x02: return &rcx;
         case 0x03: return &rdx;
         case 0x04: return &call;
+        case 0x05: return &stack;
         default: return NULL;
     }
 }

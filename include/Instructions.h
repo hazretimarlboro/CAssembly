@@ -32,7 +32,7 @@ extern uint8_t Memory[MEMORY_SIZE];
 
 
 extern uint16_t StackPointer;
-extern Register rax,rbx,rcx,rdx,call;
+extern Register rax,rbx,rcx,rdx,call,stack;
 extern struct CPUState CPU;
 
 int init(void);

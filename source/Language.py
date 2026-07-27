@@ -20,7 +20,7 @@ def lex(program_text):
     return tokens
 
 def is_register(x):
-    return x in ["rax","rbx","rcx","rdx","call"]
+    return x in ["rax","rbx","rcx","rdx","call","stack"]
 
 # ---------- Instruction Sizes ----------
 def instr_size(parts):
