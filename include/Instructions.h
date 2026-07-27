@@ -58,6 +58,6 @@ int CMP_REG(Register* reg, Register* reg2);
 int LOG(Register* reg);
 int MVN(Register* reg);
 int LOAD_REG(Register* reg, uint32_t ptr);
-int LOAD_PTR(uint32_t dest, uint32_t src);
+int STORE_PTR_REG(uint32_t lptr, Register* reg);
 
 #endif

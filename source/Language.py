@@ -64,13 +64,16 @@ def instr_size(parts):
         return 5
 
     if op == "LOAD":
-        if is_register(parts[1]):
-            return 5
-        else:
-            return 8
+        return 6
+
+    if op == "STORE":
+        return 6
+
+    # don't forget to include the instruction's own size (1 byte)
 
     if op == "RET":
         return 1
+
 
     if op in ("MOV", "ADD", "MUL", "DIV", "MOD", "CMP"):
         if is_register(parts[2]):
@@ -163,6 +166,9 @@ def parse(tokens):
 
         elif op == "LOAD":
             instructions.append(("LOAD", parts[1], parts[2]))
+
+        elif op == "STORE":
+            instructions.append(("STORE", parts[1], parts[2]))
 
         else:
             raise Exception(f"Unknown instruction: {op}")

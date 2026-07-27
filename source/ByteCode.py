@@ -28,8 +28,8 @@ OPCODES = {
     "JG"     : 0x18,
     "JLE"    : 0x19,
     "JGE"    : 0x1a,
-    "LOAD_PTR"   : 0x1b,
-    "LOAD_REG"   : 0x1c,
+    "LOAD_REG"   : 0x1b,
+    "STORE_PTR_REG": 0x1c,
     "HLT"    :  0xff
 }
 
@@ -232,19 +232,23 @@ for inst in instructions:
     elif op == "LOAD":
         if inst[1] in REGISTERS:
             # LOAD reg ptr
-            value = int(inst[2],16)
+            value = int(inst[2],0)
             bytecode.append(OPCODES["LOAD_REG"])
             bytecode.append(REGISTERS[inst[1]])
             bytecode.extend(toByte(value))
-        else:
-            # LOAD ptr ptr
-            print(f"{inst[1]} and {inst[2]}")
-            ptr1 = int(inst[1],16)
-            ptr2 = int(inst[2],16)
-            bytecode.append(OPCODES["LOAD_PTR"])
-            bytecode.extend(toByte(ptr1))
-            bytecode.extend(toByte(ptr2))
 
+    elif op == "STORE":
+        if inst[1] in REGISTERS:
+            raise Exception("[ByteCode Error] STORE instruction can not be used with a register as the first operand")
+        else:
+            if inst[2] in REGISTERS:
+                reg = REGISTERS[inst[2]]
+                lptr = int(inst[1], 0)
+                bytecode.append(OPCODES["STORE_PTR_REG"])
+                bytecode.extend(toByte(lptr))
+                bytecode.append(reg)
+            else:
+                raise Exception("ByteCode Error STORE instruction should be used like: STORE <Address> <Register>")
 
 for i, b in enumerate(bytecode):
     if not isinstance(b, int):

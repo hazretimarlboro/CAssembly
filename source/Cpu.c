@@ -39,7 +39,6 @@ int load_binary(const char *filename)
     return 0;
 }
 
-
 Register* getReg(uint8_t id)
 {
     switch(id)
@@ -70,6 +69,9 @@ int main(int argc, char** argv)
 
     PC=0;
     
+    if(argc != 2)
+        perror("Please provide an input file\n");
+
     int status = load_binary(argv[1]);
 
     switch (status)
@@ -715,25 +717,6 @@ int main(int argc, char** argv)
             }
 
             case 0x1b: {
-                //LOAD_PTR
-                if(!PCvalid(PC))
-                {
-                    printf("[VM ERROR] Segmentation fault\n");
-                    printf("opcode=0x%02X (LOAD_PTR).\n",opcode);
-                    return 1;
-                }
-                uint32_t dest = fetch_32(&PC);
-                uint32_t src  = fetch_32(&PC);
-                int status = LOAD_PTR(dest, src);
-                if(status == SEGMENTATION_FAULT)
-                {
-                    printf("[CPU ERROR] Pointer value exceeds data section's limit at instruction LOAD.\n");
-                    return 1;
-                }
-                break;
-            }
-
-            case 0x1c: {
                 //LOAD_REG
                 if(!PCvalid(PC))
                 {
@@ -754,6 +737,32 @@ int main(int argc, char** argv)
                 else if(status == NULL_POINTER_EXCEPTION)
                 {
                     printf("[CPU ERROR] NullPointerExceeption at instruction LOAD.\n");
+                    return 1;
+                }
+
+                break;
+            }
+
+            case 0x1c: {
+                // STORE_PTR_REG
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (STORE_PTR_REG).\n",opcode);
+                    return 1;
+                }
+
+                uint32_t ptr = fetch_32(&PC);
+                Register* reg = getReg(Memory[PC]);
+                int status = STORE_PTR_REG(ptr, reg);
+                if(status == SEGMENTATION_FAULT)
+                {
+                    printf("[CPU ERROR] Pointer value exceeds data section's limit at instruction STORE.\n");
+                    return 1;
+                }
+                else if(status == NULL_POINTER_EXCEPTION)
+                {
+                    printf("[CPU ERROR] NullPointerExceeption at instruction STORE.\n");
                     return 1;
                 }
 
