@@ -1,2 +1,3 @@
-/examples/test.cvasm
-program.exe
+./examples/test.cvasm
+./program.exe
+./.vscode

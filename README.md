@@ -72,6 +72,10 @@ just enough to be Turing-complete and fun to program in.
 | `JMP`  | `JMP label`          | Unconditional jump |
 | `JEQ`  | `JEQ label`          | Jump if the last `CMP` was equal |
 | `JNE`  | `JNE label`          | Jump if the last `CMP` was not equal |
+| `JL`   | `JL label`           | Jump if the last `CMP` flagged a less|
+| `JG`   | `JG label`           | Jump if the last `CMP` flagged a greater|
+| `JLE`   | `JLE label`           | Jump if the last `CMP` flagged a less or equal|
+| `JGE`   | `JGE label`           | Jump if the last `CMP` flagged a greater or equal|
 | `PUSH` | `PUSH imm/ PUSH reg`           | Push an immediate/register value onto the stack |
 | `POP`  | `POP reg`            | Pop the stack into a register |
 | `LOG`  | `LOG reg`            | Print a register's value (signed decimal) |
@@ -156,3 +160,5 @@ and a non-zero exit code instead of segfaulting.
 25-07-2026 Added PUSH register functionality
 
 26-07-2026 Added procedures with CALL and RET. Added a new register named "call" register that is used to hold the POP'ed value during procedure calls
+
+27-07-2026 Added JLE(jump if less/equal) JGE(jump if greater/equal) JG(jump if greater) and JL(jump if less)

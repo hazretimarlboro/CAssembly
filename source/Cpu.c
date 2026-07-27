@@ -452,7 +452,7 @@ int main(int argc, char** argv)
                     printf("[VM ERROR] Invalid CMP flag\n");
                     return 1;
                 }
-                if(CPU.condition)
+                if(CPU.eq)
                 {
                     PC = (uint16_t) target;
                 }
@@ -480,7 +480,7 @@ int main(int argc, char** argv)
                     return 1;
                 }
 
-                if(!CPU.condition)
+                if(!CPU.eq)
                 {
                     PC = (uint16_t) target;
                 }
@@ -602,6 +602,114 @@ int main(int argc, char** argv)
                     return 1;
                 }
 
+                break;
+            }
+
+            case 0x17: {
+                //JL
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (JL).\n",opcode);
+                    return 1;
+                }
+                uint32_t target = fetch_32(&PC);
+                if(target >= MAX_PROGRAM_SIZE)
+                {
+                    printf("[VM ERROR] Invalid JL target\n");
+                    return 1;
+                }
+
+                if(!CPU.flagValid)
+                {
+                    printf("[VM ERROR] Invalid CMP flag\n");
+                    return 1;
+                }
+                if(CPU.less)
+                {
+                    PC = (uint16_t) target;
+                }
+                break;
+            }
+
+            case 0x18: {
+                //JG
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (JG).\n",opcode);
+                    return 1;
+                }
+                uint32_t target = fetch_32(&PC);
+                if(target >= MAX_PROGRAM_SIZE)
+                {
+                    printf("[VM ERROR] Invalid JG target\n");
+                    return 1;
+                }
+
+                if(!CPU.flagValid)
+                {
+                    printf("[VM ERROR] Invalid CMP flag\n");
+                    return 1;
+                }
+                if(CPU.great)
+                {
+                    PC = (uint16_t) target;
+                }
+                break;
+            }
+
+            case 0x19: {
+                //JLE
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (JLE).\n",opcode);
+                    return 1;
+                }
+                uint32_t target = fetch_32(&PC);
+                if(target >= MAX_PROGRAM_SIZE)
+                {
+                    printf("[VM ERROR] Invalid JLE target\n");
+                    return 1;
+                }
+
+                if(!CPU.flagValid)
+                {
+                    printf("[VM ERROR] Invalid CMP flag\n");
+                    return 1;
+                }
+                if(CPU.less || CPU.eq)
+                {
+                    PC = (uint16_t) target;
+                }
+                break;
+            }
+
+            case 0x1a: {
+                //JGE
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (JGE).\n",opcode);
+                    return 1;
+                }
+                uint32_t target = fetch_32(&PC);
+                if(target >= MAX_PROGRAM_SIZE)
+                {
+                    printf("[VM ERROR] Invalid JGE target\n");
+                    return 1;
+                }
+
+                if(!CPU.flagValid)
+                {
+                    printf("[VM ERROR] Invalid CMP flag\n");
+                    return 1;
+                }
+                if(CPU.great || CPU.eq)
+                {
+                    PC = (uint16_t) target;
+                }
                 break;
             }
 

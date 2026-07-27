@@ -16,7 +16,9 @@ typedef struct Register
 struct CPUState
 {
     int running;
-    int condition;
+    int eq;
+    int less;
+    int great;
     int flagValid;
 };
 

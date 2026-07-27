@@ -12,24 +12,31 @@ uint8_t Memory[MEMORY_SIZE];
 int init(void)
 {
     StackPointer = STACK_TOP; // 0xffff
+
     CPU.running = 1;
     CPU.flagValid = 0;
-    CPU.condition = 0;
+    CPU.less = 0;
+    CPU.great = 0;
+    CPU.eq = 0;
+
     rax.ID = 0;
     rbx.ID = 1;
     rcx.ID = 2;
     rdx.ID = 3;
     call.ID = 4;
+
     rax.value = 0;
     rbx.value = 0;
     rcx.value = 0;
     rdx.value = 0;
     call.value = 0;
+
     rax.name = "rax";
     rbx.name = "rbx";
     rcx.name = "rcx";
     rdx.name = "rdx";
     call.name = "call";
+
     return SUCCESS;
 }
 
@@ -222,7 +229,9 @@ int CMP_REG(Register* reg1, Register* reg2)
         return NULL_POINTER_EXCEPTION;
     
     CPU.flagValid = 1;
-    CPU.condition = (reg1->value == reg2->value);
+    CPU.eq = (reg1->value == reg2->value);
+    CPU.less = (reg1->value < reg2->value);
+    CPU.great = (reg1->value > reg2->value);
     return SUCCESS;
 }
 
@@ -232,6 +241,8 @@ int CMP_IMM(Register* reg, uint32_t val)
         return NULL_POINTER_EXCEPTION;
 
     CPU.flagValid = 1;
-    CPU.condition = (reg->value == val);
+    CPU.eq = (reg->value == val);
+    CPU.less = (reg->value < val);
+    CPU.great = (reg->value > val);
     return SUCCESS;
 }

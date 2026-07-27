@@ -57,6 +57,9 @@ def instr_size(parts):
     if op == "JEQ":
         return 5
 
+    if op == "JL" or op == "JG" or op == "JLE" or op == "JGE":
+        return 5
+
     if op == "CALL":
         return 5
 
@@ -130,6 +133,18 @@ def parse(tokens):
 
         elif op == "JEQ":
             instructions.append(("JEQ",parts[1]))
+
+        elif op == "JL":
+            instructions.append(("JL", parts[1]))
+
+        elif op == "JG":
+            instructions.append(("JG", parts[1]))
+
+        elif op == "JLE":
+            instructions.append(("JLE", parts[1]))
+
+        elif op == "JGE":
+            instructions.append(("JGE", parts[1]))
 
         elif op == "CMP":
             instructions.append(("CMP", parts[1], parts[2]))

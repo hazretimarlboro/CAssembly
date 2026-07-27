@@ -24,6 +24,10 @@ OPCODES = {
     "PUSH_REG": 0x14,
     "CALL"   : 0x15,
     "RET"    : 0x16,
+    "JL"     : 0x17,
+    "JG"     : 0x18,
+    "JLE"    : 0x19,
+    "JGE"    : 0x1a,
     "HLT"    :  0xff
 }
 
@@ -168,6 +172,38 @@ for inst in instructions:
             bytecode.extend(toByte(target))
         else:
             raise Exception(f"[ByteCode Error] Unknown JEQ label: {inst[1]}")
+
+    elif op == "JG":
+        if inst[1] in labels:
+            target = labels[inst[1]]
+            bytecode.append(OPCODES["JG"])
+            bytecode.extend(toByte(target))
+        else:
+            raise Exception(f"[ByteCode Error] Unknown JG label: {inst[1]}")
+
+    elif op == "JL":
+        if inst[1] in labels:
+            target = labels[inst[1]]
+            bytecode.append(OPCODES["JL"])
+            bytecode.extend(toByte(target))
+        else:
+            raise Exception(f"[ByteCode Error] Unknown JL label: {inst[1]}")
+
+    elif op == "JGE":
+            if inst[1] in labels:
+                target = labels[inst[1]]
+                bytecode.append(OPCODES["JGE"])
+                bytecode.extend(toByte(target))
+            else:
+                raise Exception(f"[ByteCode Error] Unknown JGE label: {inst[1]}")
+
+    elif op == "JLE":
+            if inst[1] in labels:
+                target = labels[inst[1]]
+                bytecode.append(OPCODES["JLE"])
+                bytecode.extend(toByte(target))
+            else:
+                raise Exception(f"[ByteCode Error] Unknown JLE label: {inst[1]}")
 
     elif op == "CALL":
         if inst[1] in labels:
