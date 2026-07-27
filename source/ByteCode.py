@@ -230,12 +230,15 @@ for inst in instructions:
             bytecode.extend(toByte(imm))
 
     elif op == "LOAD":
-        if inst[1] in REGISTERS:
+        if inst[1] in REGISTERS and (not inst[2] in REGISTERS):
             # LOAD reg ptr
             value = int(inst[2],0)
             bytecode.append(OPCODES["LOAD_REG"])
             bytecode.append(REGISTERS[inst[1]])
             bytecode.extend(toByte(value))
+        else:
+            raise Exception("[ByteCode Error] LOAD instruction should be used like: LOAD <Register> <Address>")
+            
 
     elif op == "STORE":
         if inst[1] in REGISTERS:

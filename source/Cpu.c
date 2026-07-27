@@ -69,8 +69,10 @@ int main(int argc, char** argv)
 
     PC=0;
     
-    if(argc != 2)
-        perror("Please provide an input file\n");
+    if(argc != 2) {
+        fprintf(stderr, "Usage: %s <program.bin>\n", argv[0]);
+        return 1;
+    }
 
     int status = load_binary(argv[1]);
 
@@ -754,6 +756,7 @@ int main(int argc, char** argv)
 
                 uint32_t ptr = fetch_32(&PC);
                 Register* reg = getReg(Memory[PC]);
+                PC++;
                 int status = STORE_PTR_REG(ptr, reg);
                 if(status == SEGMENTATION_FAULT)
                 {

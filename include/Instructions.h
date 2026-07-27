@@ -1,5 +1,5 @@
 #ifndef VIMINC_H
-#define VIM INC_H
+#define VIMINC_H
 #define MEMORY_SIZE 0xFFFF
 #define STACK_TOP 0xFFFF
 #define STACK_BOTTOM 0xA000

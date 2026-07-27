@@ -1,4 +1,129 @@
-LOAD 0x8700 0x8000
-LOAD rax 0x8700
-LOG rax
-HLT
+; ================================================================
+;  complex_demo.asm
+;  A tour of every instruction this VM supports:
+;  arithmetic (ADD/MUL/DIV/MOD), signed negation (MVN), all six
+;  comparison jumps, CALL/RET subroutines with a real calling
+;  convention, stack save/restore (PUSH/POP), and memory
+;  load/store (LOAD/STORE).
+; ================================================================
+
+; ---------------- Part 1: sum of squares 1..10 (real loop) -----
+    MOV rax 0
+    MOV rcx 1
+SUMSQ_LOOP:
+    MOV rdx rcx
+    MUL rdx rcx
+    ADD rax rdx
+    ADD rcx 1
+    CMP rcx 10
+    JLE SUMSQ_LOOP
+    LOG rax
+    STORE 0x8000 rax
+    LOAD rbx 0x8000
+    LOG rbx
+
+; ---------------- Part 2: 7! via CALL/RET subroutine -----------
+    MOV rax 7
+    CALL FACTORIAL
+    LOG rax
+    STORE 0x8004 rax
+
+; ---------------- Part 3: primes 2..30 via MOD trial division --
+    MOV rcx 2
+P3_LOOP:
+    CMP rcx 30
+    JG P3_DONE
+    MOV rdx rcx
+    CALL IS_PRIME
+    CMP rax 1
+    JNE P3_SKIP
+    LOG rcx
+P3_SKIP:
+    ADD rcx 1
+    JMP P3_LOOP
+P3_DONE:
+
+; ---------------- Part 4: MVN + all four ordering jumps --------
+    MOV rax 15
+    MVN rax
+    LOG rax
+    MOV rbx 5
+    CMP rax rbx
+    JL P4_LESS
+    MOV rcx 999
+    LOG rcx
+    JMP P4_NEXT
+P4_LESS:
+    MOV rcx 111
+    LOG rcx
+
+P4_NEXT:
+    CMP rax rax
+    JEQ P4_EQ
+    MOV rcx 222
+    LOG rcx
+    JMP P4_GE_TEST
+P4_EQ:
+    MOV rcx 333
+    LOG rcx
+
+P4_GE_TEST:
+    MOV rdx 0
+    CMP rdx rax
+    JGE P4_GE_YES
+    MOV rcx 555
+    LOG rcx
+    JMP P4_END
+P4_GE_YES:
+    MOV rcx 444
+    LOG rcx
+
+P4_END:
+    STORE 0x8008 rax
+    LOAD rbx 0x8008
+    LOG rbx
+    LOG stack
+
+    HLT
+
+; ================================================================
+;  Subroutines (only ever reached via CALL, never fallen into)
+; ================================================================
+FACTORIAL:
+    ; in: rax = n     out: rax = n!     clobbers: rbx (saved/restored)
+    PUSH rbx
+    MOV rbx rax
+    MOV rax 1
+FACT_LOOP:
+    CMP rbx 1
+    JLE FACT_DONE
+    MUL rax rbx
+    ADD rbx -1
+    JMP FACT_LOOP
+FACT_DONE:
+    POP rbx
+    RET
+
+IS_PRIME:
+    ; in: rdx = n     out: rax = 1 if prime else 0     clobbers: rbx (saved/restored)
+    PUSH rbx
+    CMP rdx 2
+    JL IP_NO
+    MOV rbx 2
+IP_LOOP:
+    CMP rbx rdx
+    JGE IP_YES
+    MOV rax rdx
+    MOD rax rbx
+    CMP rax 0
+    JEQ IP_NO
+    ADD rbx 1
+    JMP IP_LOOP
+IP_NO:
+    MOV rax 0
+    JMP IP_DONE
+IP_YES:
+    MOV rax 1
+IP_DONE:
+    POP rbx
+    RET
