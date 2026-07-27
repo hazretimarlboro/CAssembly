@@ -72,9 +72,6 @@ int main(int argc, char** argv)
     
     int status = load_binary(argv[1]);
 
-    //debug
-    write_u32(0x8000, 128);
-
     switch (status)
     {
         case 1:
@@ -718,7 +715,22 @@ int main(int argc, char** argv)
             }
 
             case 0x1b: {
-
+                //LOAD_PTR
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (LOAD_PTR).\n",opcode);
+                    return 1;
+                }
+                uint32_t dest = fetch_32(&PC);
+                uint32_t src  = fetch_32(&PC);
+                int status = LOAD_PTR(dest, src);
+                if(status == SEGMENTATION_FAULT)
+                {
+                    printf("[CPU ERROR] Pointer value exceeds data section's limit at instruction LOAD.\n");
+                    return 1;
+                }
+                break;
             }
 
             case 0x1c: {

@@ -1,3 +1,4 @@
 LOAD 0x8700 0x8000
-
+LOAD rax 0x8700
+LOG rax
 HLT
