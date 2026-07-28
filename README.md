@@ -164,3 +164,5 @@ and a non-zero exit code instead of segfaulting.
 27-07-2026 Added JLE(jump if less/equal) JGE(jump if greater/equal) JG(jump if greater) and JL(jump if less)
 
 27-07-2026 Added stack pointer register "stack"
+
+27-07-2026 Added the new instruction "STORE". Which allows you to store register values directly into the memory

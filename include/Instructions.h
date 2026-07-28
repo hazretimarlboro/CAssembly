@@ -1,11 +1,11 @@
 #ifndef VIMINC_H
 #define VIMINC_H
-#define MEMORY_SIZE 0xFFFF
+#define MEMORY_SIZE 0x10000
 #define STACK_TOP 0xFFFF
-#define STACK_BOTTOM 0xA000
-#define MAX_PROGRAM_SIZE 0x7FFF
-#define DATA_MAX 0x9FFF
-#define DATA_MIN 0x8000
+#define STACK_BOTTOM 0xE000 
+#define MAX_PROGRAM_SIZE 0x9FFF  
+#define DATA_MAX 0xDFFF
+#define DATA_MIN 0xA000
 #include <stdint.h>
 
 typedef struct Register
@@ -26,9 +26,9 @@ struct CPUState
 
 extern uint8_t Memory[MEMORY_SIZE];
 /*
-    0x0000 - 0x7FFF -> the program
-    0x8000 - 0x9FFF → data (variables)
-    0xA000 - 0xffff -> Stack
+    0x0000 - 0x9FFF -> the program
+    0xA000 - 0xDFFF → data (variables)
+    0xE000  - 0xFFFF -> Stack
     because this prevents chaos between the stack and the memory layouts.
 */
 

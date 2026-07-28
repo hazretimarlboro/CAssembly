@@ -18,15 +18,15 @@ SUMSQ_LOOP:
     CMP rcx 10
     JLE SUMSQ_LOOP
     LOG rax
-    STORE 0x8000 rax
-    LOAD rbx 0x8000
+    STORE 0xA000 rax
+    LOAD rbx 0xA000
     LOG rbx
 
 ; ---------------- Part 2: 7! via CALL/RET subroutine -----------
     MOV rax 7
     CALL FACTORIAL
     LOG rax
-    STORE 0x8004 rax
+    STORE 0xA004 rax
 
 ; ---------------- Part 3: primes 2..30 via MOD trial division --
     MOV rcx 2
@@ -79,8 +79,8 @@ P4_GE_YES:
     LOG rcx
 
 P4_END:
-    STORE 0x8008 rax
-    LOAD rbx 0x8008
+    STORE 0xA008 rax
+    LOAD rbx 0xA008
     LOG rbx
     LOG stack
 
