@@ -804,7 +804,7 @@ int main(int argc, char** argv)
                 PC++;
                 Register* regright = getReg(Memory[PC]);
                 PC++;
-                int status = ADD_REG(regleft,regright);
+                int status = SUB_REG(regleft,regright);
                 if(status == NULL_POINTER_EXCEPTION)
                 {
                     printf("[CPU ERROR] NullPointerException at instruction SUB.\n");

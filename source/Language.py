@@ -104,7 +104,7 @@ def parse(tokens):
         if op == "ADD":
             instructions.append(("ADD", parts[1], parts[2]))
 
-        if op == "SUB":
+        elif op == "SUB":
             instructions.append(("SUB", parts[1], parts[2]))
 
         elif op == "PUSH":
