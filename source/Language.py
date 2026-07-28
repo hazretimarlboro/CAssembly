@@ -75,7 +75,7 @@ def instr_size(parts):
         return 1
 
 
-    if op in ("MOV", "ADD", "MUL", "DIV", "MOD", "CMP"):
+    if op in ("MOV", "ADD", "SUB","MUL", "DIV", "MOD", "CMP"):
         if is_register(parts[2]):
             return 3
         else:
@@ -103,6 +103,9 @@ def parse(tokens):
 
         if op == "ADD":
             instructions.append(("ADD", parts[1], parts[2]))
+
+        if op == "SUB":
+            instructions.append(("SUB", parts[1], parts[2]))
 
         elif op == "PUSH":
             instructions.append(("PUSH", parts[1]))

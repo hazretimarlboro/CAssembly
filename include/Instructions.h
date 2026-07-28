@@ -59,5 +59,7 @@ int LOG(Register* reg);
 int MVN(Register* reg);
 int LOAD_REG(Register* reg, uint32_t ptr);
 int STORE_PTR_REG(uint32_t lptr, Register* reg);
+int SUB_IMM(Register* reg, uint32_t val);
+int SUB_REG(Register* reg1, Register* reg2);
 
 #endif

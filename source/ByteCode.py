@@ -30,6 +30,8 @@ OPCODES = {
     "JGE"    : 0x1a,
     "LOAD_REG"   : 0x1b,
     "STORE_PTR_REG": 0x1c,
+    "SUB_IMM"          : 0x1d,
+    "SUB_REG"          : 0x1e,
     "HLT"    :  0xff
 }
 
@@ -86,6 +88,19 @@ for inst in instructions:
             bytecode.append(OPCODES["ADD_IMM"])
             bytecode.append(reg1)
             bytecode.extend(toByte(imm))
+
+    elif op == "SUB":
+            reg1 = REGISTERS[inst[1]]
+            if inst[2] in REGISTERS:
+                reg2 = REGISTERS[inst[2]]
+                bytecode.append(OPCODES["SUB_REG"])
+                bytecode.append(reg1)
+                bytecode.append(reg2)
+            else:
+                imm = int(inst[2])
+                bytecode.append(OPCODES["SUB_IMM"])
+                bytecode.append(reg1)
+                bytecode.extend(toByte(imm))
 
     elif op == "MUL":
         reg1 = REGISTERS[inst[1]]

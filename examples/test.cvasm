@@ -98,7 +98,7 @@ FACT_LOOP:
     CMP rbx 1
     JLE FACT_DONE
     MUL rax rbx
-    ADD rbx -1
+    SUB rbx 1
     JMP FACT_LOOP
 FACT_DONE:
     POP rbx

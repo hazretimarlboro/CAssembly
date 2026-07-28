@@ -177,7 +177,7 @@ int main(int argc, char** argv)
                 if(!PCvalid(PC))
                 {
                     printf("[VM ERROR] Segmentation fault\n");
-                    printf("opcode=0x%02X (MOV).\n",opcode);
+                    printf("opcode=0x%02X (MOV_REG).\n",opcode);
                     return 1;
                 }
                 Register* regleft = getReg(Memory[PC]);
@@ -199,7 +199,7 @@ int main(int argc, char** argv)
                 if(!PCvalid(PC))
                 {
                     printf("[VM ERROR] Segmentation fault\n");
-                    printf("opcode=0x%02X (ADD).\n",opcode);
+                    printf("opcode=0x%02X (ADD_IMM).\n",opcode);
                     return 1;
                 }
                 Register* regleft = getReg(Memory[PC]);
@@ -219,7 +219,7 @@ int main(int argc, char** argv)
                 if(!PCvalid(PC))
                 {
                     printf("[VM ERROR] Segmentation fault\n");
-                    printf("opcode=0x%02X (ADD).\n",opcode);
+                    printf("opcode=0x%02X (ADD_REG).\n",opcode);
                     return 1;
                 }
                 Register* regleft = getReg(Memory[PC]);
@@ -241,7 +241,7 @@ int main(int argc, char** argv)
                 if(!PCvalid(PC))
                 {
                     printf("[VM ERROR] Segmentation fault\n");
-                    printf("opcode=0x%02X (MUL).\n",opcode);
+                    printf("opcode=0x%02X (MUL_IMM).\n",opcode);
                     return 1;
                 }
                 Register* regleft = getReg(Memory[PC]);
@@ -769,6 +769,48 @@ int main(int argc, char** argv)
                     return 1;
                 }
 
+                break;
+            }
+
+            case 0x1d: {
+                //SUB_IMM
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (SUB_IMM).\n",opcode);
+                    return 1;
+                }
+                Register* regleft = getReg(Memory[PC]);
+                PC++;
+                uint32_t val = fetch_32(&PC);
+                int status = SUB_IMM(regleft,val);
+                if(status == NULL_POINTER_EXCEPTION)
+                {
+                    printf("[CPU ERROR] NullPointerException at instruction SUB.\n");
+                    return 1;
+                }
+                break;
+            }
+
+            case 0x1e: {
+                //SUB_REG
+                if(!PCvalid(PC))
+                {
+                    printf("[VM ERROR] Segmentation fault\n");
+                    printf("opcode=0x%02X (SUB_REG).\n",opcode);
+                    return 1;
+                }
+                Register* regleft = getReg(Memory[PC]);
+                PC++;
+                Register* regright = getReg(Memory[PC]);
+                PC++;
+                int status = ADD_REG(regleft,regright);
+                if(status == NULL_POINTER_EXCEPTION)
+                {
+                    printf("[CPU ERROR] NullPointerException at instruction SUB.\n");
+
+                    return 1;
+                }
                 break;
             }
 

@@ -131,6 +131,26 @@ int ADD_REG(Register* reg1, Register* reg2)
     return SUCCESS;
 }
 
+int SUB_IMM(Register* reg, uint32_t val)
+{
+    if(!reg)
+        return NULL_POINTER_EXCEPTION;
+
+    reg->value -= val;
+
+    return SUCCESS;
+}
+
+int SUB_REG(Register* reg1, Register* reg2)
+{
+    if(!reg1 || !reg2)
+        return NULL_POINTER_EXCEPTION;
+    
+    reg1->value -= reg2->value;
+
+    return SUCCESS;
+}
+
 int MUL_IMM(Register* reg, uint32_t val)
 {
     if(!reg)
